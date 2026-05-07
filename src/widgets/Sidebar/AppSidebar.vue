@@ -40,6 +40,7 @@
           item.variant === 'danger' ? dangerLinkIdleClass : menuLinkIdleClass,
         ]"
         type="button"
+        @click="handleBottomMenuClick(item.id)"
       >
         <span class="text-3xl text-current transition-colors">
           <VueIcon :name="item.icon" />
@@ -48,14 +49,20 @@
       </button>
     </nav>
   </aside>
+  <SettingsDialog v-model:visible="settingsVisible" />
 </template>
 
 <script setup lang="ts">
+import { SettingsDialog } from '@/modules/setting'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, type RouteLocationRaw } from 'vue-router'
 
 const route = useRoute()
 const { t } = useI18n()
+const settingsVisible = ref<boolean>(false)
+
+type BottomMenuItemId = 'settings' | 'exit'
 
 const menuItemsBar: { to: RouteLocationRaw; titleKey: string; icon: string }[] = [
   {
@@ -69,12 +76,13 @@ const menuItemsBar: { to: RouteLocationRaw; titleKey: string; icon: string }[] =
 ]
 
 const bottomMenuItems: {
+  id: BottomMenuItemId
   titleKey: string
   icon: string
   variant?: 'danger'
 }[] = [
-  { titleKey: 'sidebar.settings', icon: 'ca:settings' },
-  { titleKey: 'sidebar.exit', icon: 'ra:exit', variant: 'danger' },
+  { id: 'settings', titleKey: 'sidebar.settings', icon: 'ca:settings' },
+  { id: 'exit', titleKey: 'sidebar.exit', icon: 'ra:exit', variant: 'danger' },
 ]
 
 const menuLinkBaseClass =
@@ -88,6 +96,12 @@ const menuLinkIdleClass =
 
 const dangerLinkIdleClass =
   'border-transparent bg-transparent text-(--color-on-surface-variant) hover:border-l-(--color-error) hover:bg-(--color-menu-danger-hover-bg) hover:text-(--color-error)'
+
+const handleBottomMenuClick = (itemId: BottomMenuItemId): void => {
+  if (itemId === 'settings') {
+    settingsVisible.value = true
+  }
+}
 </script>
 
 <style scoped></style>

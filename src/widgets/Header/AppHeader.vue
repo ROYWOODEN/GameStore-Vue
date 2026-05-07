@@ -36,6 +36,15 @@
         <button
           class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-xl text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
           type="button"
+          :aria-label="isDark ? t('header.themeLight') : t('header.themeDark')"
+          @click="toggleTheme"
+        >
+          <VueIcon :name="isDark ? 'bs:sun-fill' : 'bs:moon-stars-fill'" />
+        </button>
+
+        <button
+          class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-xl text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
+          type="button"
           :aria-label="t('header.notifications')"
         >
           <VueIcon name="bs:bell" />
@@ -52,14 +61,12 @@
         <Button :label="t('header.login')" />
       </div>
     </div>
-    <button @click="toggleTheme">
-      {{ isDark ? t('header.themeLight') : t('header.themeDark') }}
-    </button>
   </header>
 </template>
 
 <script setup lang="ts">
 import { setLocale, type AppLocale } from '@/app/i18n'
+import { useAppTheme } from '@/app/theme/useAppTheme'
 import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import IconField from 'primevue/iconfield'
@@ -69,6 +76,7 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { locale, t } = useI18n()
+const { isDark, toggleTheme } = useAppTheme()
 
 const search = ref('')
 const searchLoading = ref(false)
@@ -89,12 +97,6 @@ watch(search, (value) => {
     searchLoading.value = false
   }, 700)
 })
-
-const isDark = ref(false)
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  document.documentElement.classList.toggle('app-dark', isDark.value)
-}
 
 const toggleLocale = () => {
   setLocale((locale.value === 'ru' ? 'en' : 'ru') as AppLocale)
