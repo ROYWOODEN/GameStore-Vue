@@ -9,7 +9,7 @@
     <nav class="mt-8 flex w-full flex-col gap-1">
       <RouterLink
         v-for="item in menuItemsBar"
-        :key="item.title"
+        :key="item.titleKey"
         :to="item.to"
         custom
         v-slot="{ href, navigate }"
@@ -26,7 +26,7 @@
           <span class="text-3xl text-current transition-colors">
             <VueIcon :name="item.icon" />
           </span>
-          <span>{{ item.title }}</span>
+          <span>{{ t(item.titleKey) }}</span>
         </a>
       </RouterLink>
     </nav>
@@ -34,7 +34,7 @@
     <nav class="mt-auto flex w-full flex-col gap-1 border-t border-(--color-sidebar-border) pt-3">
       <button
         v-for="item in bottomMenuItems"
-        :key="item.title"
+        :key="item.titleKey"
         :class="[
           menuLinkBaseClass,
           item.variant === 'danger' ? dangerLinkIdleClass : menuLinkIdleClass,
@@ -44,35 +44,37 @@
         <span class="text-3xl text-current transition-colors">
           <VueIcon :name="item.icon" />
         </span>
-        <span>{{ item.title }}</span>
+        <span>{{ t(item.titleKey) }}</span>
       </button>
     </nav>
   </aside>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useRoute, type RouteLocationRaw } from 'vue-router'
 
 const route = useRoute()
+const { t } = useI18n()
 
-const menuItemsBar: { to: RouteLocationRaw; title: string; icon: string }[] = [
+const menuItemsBar: { to: RouteLocationRaw; titleKey: string; icon: string }[] = [
   {
     to: '/',
-    title: 'Main',
+    titleKey: 'sidebar.main',
     icon: 'fl:home',
   },
-  { to: '/catalog', title: 'Catalog', icon: 'an:outlined-appstore' },
-  { to: '/favorites', title: 'Favorites', icon: 'bs:heart' },
-  { to: '/library', title: 'Library', icon: 'co:library' },
+  { to: '/catalog', titleKey: 'sidebar.catalog', icon: 'an:outlined-appstore' },
+  { to: '/favorites', titleKey: 'sidebar.favorites', icon: 'bs:heart' },
+  { to: '/library', titleKey: 'sidebar.library', icon: 'co:library' },
 ]
 
 const bottomMenuItems: {
-  title: string
+  titleKey: string
   icon: string
   variant?: 'danger'
 }[] = [
-  { title: 'Setting', icon: 'ca:settings' },
-  { title: 'Exit', icon: 'ra:exit', variant: 'danger' },
+  { titleKey: 'sidebar.settings', icon: 'ca:settings' },
+  { titleKey: 'sidebar.exit', icon: 'ra:exit', variant: 'danger' },
 ]
 
 const menuLinkBaseClass =
