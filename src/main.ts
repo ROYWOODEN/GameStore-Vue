@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config'
 import { createApp } from 'vue'
 
 import App from './App.vue'
+import { i18n } from './app/i18n'
 import router from './app/router'
 import { GameStorePreset } from './app/theme/game-store'
 
@@ -22,5 +23,6 @@ app.use(PrimeVue, {
     },
   },
 })
+app.use(i18n)
 
 app.mount('#app')
