@@ -1,4 +1,77 @@
 export const ru = {
+  common: {
+    loading: 'Загрузка',
+  },
+  game: {
+    addToCart: 'Добавить',
+    addToFavorites: 'Добавить в избранное',
+    coverPlaceholder: 'Обложка игры отсутствует',
+    platforms: 'Платформы',
+  },
+  mainPage: {
+    emptyDescription: 'Попробуйте зайти позже: каталог скоро появится.',
+    emptyTitle: 'Игр пока нет',
+    loadErrorTitle: 'Не удалось загрузить игры',
+    retry: 'Повторить',
+  },
+  errors: {
+    title: 'Ошибка',
+    internal: 'Внутренняя ошибка сервера',
+    network: 'Нет соединения с сервером. Проверьте интернет и попробуйте снова.',
+    common: {
+      not_found: 'Запрошенный ресурс не найден',
+    },
+    auth: {
+      already_authorized: 'Вы уже авторизованы',
+      expired: 'Сессия истекла. Войдите снова.',
+      forbidden: 'Недостаточно прав для этого действия',
+      invalid_credentials: 'Неверная почта или пароль',
+      oauth_failed: 'Не удалось войти через внешний сервис',
+      oauth_not_configured: 'Вход через внешний сервис не настроен',
+      refresh_failed: 'Не удалось обновить сессию. Войдите снова.',
+      unauthorized: 'Требуется авторизация',
+      validation: 'Проверьте данные авторизации',
+    },
+    basket: {
+      already_exists: 'Игра уже есть в корзине',
+    },
+    checkout: {
+      already_owned: 'Эта игра уже есть в вашей библиотеке',
+      empty: 'Корзина пуста',
+      not_in_basket: 'Этой игры нет в корзине',
+    },
+    favorites: {
+      already_exists: 'Игра уже добавлена в избранное',
+    },
+    games: {
+      title_taken: 'Игра с таким названием уже существует',
+    },
+    payments: {
+      create_failed: 'Не удалось создать платеж',
+      provider_not_configured: 'Платежный провайдер не настроен',
+      webhook_invalid: 'Некорректное уведомление от платежного сервиса',
+    },
+    users: {
+      email_taken: 'Пользователь с такой почтой уже существует',
+    },
+    validation: {
+      failed: 'Проверьте заполненные поля',
+      files_required: 'Добавьте необходимые файлы',
+      invalid_file_type: 'Недопустимый тип файла',
+      no_fields_to_update: 'Нет данных для обновления',
+      no_valid_fields_to_update: 'Нет корректных данных для обновления',
+    },
+    upload: {
+      failed: 'Не удалось загрузить файл',
+      file_too_large: 'Файл слишком большой',
+      too_many_files: 'Слишком много файлов',
+      unexpected_upload_error: 'Во время загрузки произошла ошибка',
+      unknown_type: 'Неизвестный тип файла',
+    },
+    db: {
+      unavailable: 'База данных временно недоступна. Попробуйте позже.',
+    },
+  },
   header: {
     cart: 'Корзина',
     language: 'EN',

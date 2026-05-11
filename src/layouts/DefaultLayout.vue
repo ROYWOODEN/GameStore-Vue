@@ -2,21 +2,18 @@
   <div>
     <AppHeader />
     <AppSidebar />
-    <slot
-      ><ProgressSpinner
-        style="width: 50px; height: 50px"
-        strokeWidth="5"
-        fill="transparent"
-        animationDuration=".9s"
-        aria-label="Loading"
-    /></slot>
+    <slot>
+      <main class="ml-[20%] mt-20 min-h-[calc(100vh-5rem)] bg-(--color-background)">
+        <PageLoader />
+      </main>
+    </slot>
   </div>
 </template>
 
 <script setup lang="ts">
+import { PageLoader } from '@/shared/ui'
 import { AppHeader } from '@/widgets/Header'
 import { AppSidebar } from '@/widgets/Sidebar'
-import ProgressSpinner from 'primevue/progressspinner'
 </script>
 
 <style scoped></style>
