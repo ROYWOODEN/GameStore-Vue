@@ -1,5 +1,7 @@
 <template>
-  <header class="fixed top-0 right-0 w-[80%] px-6 py-3">
+  <header
+    class="fixed top-0 right-0 z-40 w-[80%] border-b border-(--color-outline-variant) bg-(--color-background) px-6 py-3"
+  >
     <div class="flex items-center gap-6">
       <div class="min-w-40"></div>
 

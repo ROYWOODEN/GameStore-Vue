@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="fixed left-0 top-0 flex h-full w-[20%] flex-col border-r border-(--color-sidebar-border) bg-(--color-sidebar) py-3"
+    class="fixed left-0 top-0 z-50 flex h-full w-[20%] flex-col border-r border-(--color-sidebar-border) bg-(--color-sidebar) py-3"
   >
     <div class="flex w-full justify-center px-6">
       <img src="/logo.svg" alt="" />
