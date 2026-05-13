@@ -16,6 +16,17 @@ export const ru = {
   },
   errors: {
     title: 'Ошибка',
+    types: {
+      ValidationError: 'Ошибка валидации',
+      AuthError: 'Ошибка авторизации',
+      AuthTokenExpired: 'Сессия истекла',
+      UploadError: 'Ошибка загрузки',
+      DbError: 'Ошибка базы данных',
+      InternalError: 'Ошибка сервера',
+      NotFoundError: 'Ресурс не найден',
+      NetworkError: 'Ошибка сети',
+      UnknownError: 'Неизвестная ошибка',
+    },
     internal: 'Внутренняя ошибка сервера',
     network: 'Нет соединения с сервером. Проверьте интернет и попробуйте снова.',
     common: {
@@ -23,6 +34,7 @@ export const ru = {
     },
     auth: {
       already_authorized: 'Вы уже авторизованы',
+      email_taken: 'Пользователь с такой почтой уже существует',
       expired: 'Сессия истекла. Войдите снова.',
       forbidden: 'Недостаточно прав для этого действия',
       invalid_credentials: 'Неверная почта или пароль',
@@ -70,6 +82,45 @@ export const ru = {
     },
     db: {
       unavailable: 'База данных временно недоступна. Попробуйте позже.',
+    },
+  },
+  auth: {
+    actions: {
+      google: 'Продолжить с Google',
+      login: 'Войти',
+      register: 'Создать аккаунт',
+    },
+    fields: {
+      email: 'Почта',
+      name: 'Имя',
+      password: 'Пароль',
+    },
+    modes: {
+      login: 'Вход',
+      register: 'Регистрация',
+    },
+    placeholders: {
+      email: "name{'@'}example.com",
+      name: 'Ваше имя',
+      password: 'Введите пароль',
+    },
+    switch: {
+      toLoginAction: 'Войти',
+      toLoginText: 'Уже есть аккаунт?',
+      toRegisterAction: 'Зарегистрируйтесь',
+      toRegisterText: 'Нет аккаунта?',
+    },
+    title: {
+      login: 'Вход в аккаунт',
+      register: 'Регистрация',
+    },
+    validation: {
+      email: 'Введите корректную почту',
+      nameMin: 'Имя должно быть не короче 3 символов',
+      passwordDigit: 'Пароль должен содержать хотя бы одну цифру',
+      passwordMin: 'Пароль должен быть не короче 8 символов',
+      passwordUppercase: 'Пароль должен содержать хотя бы одну заглавную латинскую букву',
+      required: 'Поле обязательно',
     },
   },
   header: {
