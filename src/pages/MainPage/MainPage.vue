@@ -29,7 +29,7 @@
     <RetryState
       v-else-if="loadError"
       :title="t('mainPage.loadErrorTitle')"
-      :message="getErrorMessage(loadError.message)"
+      :message="getMessage(loadError.message)"
       :action-label="t('mainPage.retry')"
       @retry="loadGames"
     />
@@ -50,35 +50,33 @@
 
 <script setup lang="ts">
 import { GameCardItem, useGames } from '@/modules/game'
+import { toApiError } from '@/shared/api/error'
+import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
-import type { ApiError } from '@/shared/api/api'
+import { AnimatePresence, motion } from 'motion-v'
 import { useToast } from 'primevue/usetoast'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AnimatePresence, motion } from 'motion-v'
 
 const toast = useToast()
-const { t, te } = useI18n()
+const { t } = useI18n()
 
 const { getGames, games, isLoading, loadError } = useGames()
 
-const getErrorMessage = (message: string) => (te(message) ? t(message) : message)
-
+const { getMessage } = useI18nMessage()
 const loadGames = async () => {
   try {
     await getGames()
-  } catch (error) {
-    const err = error as ApiError
+  } catch (error: unknown) {
+    const ApiError = toApiError(error)
     toast.add({
       severity: 'error',
-      summary: t('errors.title'),
-      detail: getErrorMessage(err.message),
+      summary: getMessage(`errors.types.${ApiError.type}`),
+      detail: getMessage(ApiError.message),
       life: 3000,
     })
   }
 }
 
-onMounted(() => {
-  loadGames()
-})
+onMounted(() => loadGames())
 </script>

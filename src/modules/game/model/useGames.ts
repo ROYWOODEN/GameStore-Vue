@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { fetchGames } from '../api/games.api'
 import type { GameListItem } from '../types/game'
 import type { ApiError } from '@/shared/api/api'
+import { toApiError } from '@/shared/api/error'
 
 export const useGames = () => {
   const isLoading = ref<boolean>(false)
@@ -12,8 +13,8 @@ export const useGames = () => {
       isLoading.value = true
       loadError.value = null
       games.value = await fetchGames()
-    } catch (err) {
-      const apiError = err as ApiError
+    } catch (error: unknown) {
+      const apiError = toApiError(error)
       loadError.value = apiError
       throw apiError
     } finally {

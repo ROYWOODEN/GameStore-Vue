@@ -18,6 +18,17 @@ export const en = {
   },
   errors: {
     title: 'Error',
+    types: {
+      ValidationError: 'Validation error',
+      AuthError: 'Authentication error',
+      AuthTokenExpired: 'Session expired',
+      UploadError: 'Upload error',
+      DbError: 'Database error',
+      InternalError: 'Server error',
+      NotFoundError: 'Resource not found',
+      NetworkError: 'Network error',
+      UnknownError: 'Unknown error',
+    },
     internal: 'Internal server error',
     network: 'Could not connect to the server. Check your connection and try again.',
     common: {
@@ -25,6 +36,7 @@ export const en = {
     },
     auth: {
       already_authorized: 'You are already signed in',
+      email_taken: 'A user with this email already exists',
       expired: 'Your session has expired. Sign in again.',
       forbidden: 'You do not have permission to perform this action',
       invalid_credentials: 'Invalid email or password',
@@ -72,6 +84,45 @@ export const en = {
     },
     db: {
       unavailable: 'The database is temporarily unavailable. Try again later.',
+    },
+  },
+  auth: {
+    actions: {
+      google: 'Continue with Google',
+      login: 'Log in',
+      register: 'Create account',
+    },
+    fields: {
+      email: 'Email',
+      name: 'Name',
+      password: 'Password',
+    },
+    modes: {
+      login: 'Login',
+      register: 'Register',
+    },
+    placeholders: {
+      email: "name{'@'}example.com",
+      name: 'Your name',
+      password: 'Enter password',
+    },
+    switch: {
+      toLoginAction: 'Log in',
+      toLoginText: 'Already have an account?',
+      toRegisterAction: 'Register',
+      toRegisterText: 'No account?',
+    },
+    title: {
+      login: 'Log in to your account',
+      register: 'Create account',
+    },
+    validation: {
+      email: 'Enter a valid email',
+      nameMin: 'Name must be at least 3 characters',
+      passwordDigit: 'Password must contain at least one digit',
+      passwordMin: 'Password must be at least 8 characters',
+      passwordUppercase: 'Password must contain at least one uppercase Latin letter',
+      required: 'This field is required',
     },
   },
   header: {

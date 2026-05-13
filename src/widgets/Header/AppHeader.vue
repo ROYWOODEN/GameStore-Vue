@@ -60,7 +60,11 @@
           <VueIcon name="bs:basket-3-fill" />
         </button>
 
-        <Button :label="t('header.login')" />
+        <Button
+          v-if="!isAuthenticated"
+          :label="t('header.login')"
+          @click="openAuthDialog('login')"
+        />
       </div>
     </div>
   </header>
@@ -69,6 +73,7 @@
 <script setup lang="ts">
 import { setLocale, type AppLocale } from '@/app/i18n'
 import { useAppTheme } from '@/app/theme/useAppTheme'
+import { useAuth, useAuthDialog } from '@/modules/auth'
 import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import IconField from 'primevue/iconfield'
@@ -79,6 +84,8 @@ import { useI18n } from 'vue-i18n'
 
 const { locale, t } = useI18n()
 const { isDark, toggleTheme } = useAppTheme()
+const { openAuthDialog } = useAuthDialog()
+const { isAuthenticated } = useAuth()
 
 const search = ref('')
 const searchLoading = ref(false)

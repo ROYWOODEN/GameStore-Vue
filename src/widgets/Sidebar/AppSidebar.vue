@@ -53,16 +53,30 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '@/modules/auth'
 import { SettingsDialog } from '@/modules/setting'
-import { ref } from 'vue'
+import { toApiError } from '@/shared/api/error'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, type RouteLocationRaw } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 
 const route = useRoute()
+const { isAuthenticated } = useAuth()
+const { getMessage } = useI18nMessage()
 const { t } = useI18n()
+const toast = useToast()
+const { logout } = useAuth()
 const settingsVisible = ref<boolean>(false)
 
 type BottomMenuItemId = 'settings' | 'exit'
+type BottomMenuItem = {
+  id: BottomMenuItemId
+  titleKey: string
+  icon: string
+  variant?: 'danger'
+}
 
 const menuItemsBar: { to: RouteLocationRaw; titleKey: string; icon: string }[] = [
   {
@@ -75,15 +89,12 @@ const menuItemsBar: { to: RouteLocationRaw; titleKey: string; icon: string }[] =
   { to: '/library', titleKey: 'sidebar.library', icon: 'co:library' },
 ]
 
-const bottomMenuItems: {
-  id: BottomMenuItemId
-  titleKey: string
-  icon: string
-  variant?: 'danger'
-}[] = [
+const bottomMenuItems = computed<BottomMenuItem[]>(() => [
   { id: 'settings', titleKey: 'sidebar.settings', icon: 'ca:settings' },
-  { id: 'exit', titleKey: 'sidebar.exit', icon: 'ra:exit', variant: 'danger' },
-]
+  ...(isAuthenticated.value
+    ? ([{ id: 'exit', titleKey: 'sidebar.exit', icon: 'ra:exit', variant: 'danger' }] as const)
+    : []),
+])
 
 const menuLinkBaseClass =
   'group flex min-h-16 cursor-pointer items-center gap-5 border-l-4 px-8 text-left text-xl font-semibold transition-colors'
@@ -100,6 +111,21 @@ const dangerLinkIdleClass =
 const handleBottomMenuClick = (itemId: BottomMenuItemId): void => {
   if (itemId === 'settings') {
     settingsVisible.value = true
+  } else {
+    handleLogout()
+  }
+}
+const handleLogout = async (): Promise<void> => {
+  try {
+    await logout()
+  } catch (error: unknown) {
+    const apiError = toApiError(error)
+    toast.add({
+      severity: 'error',
+      summary: t('errors.title'),
+      detail: getMessage(apiError.message),
+      life: 3000,
+    })
   }
 }
 </script>
