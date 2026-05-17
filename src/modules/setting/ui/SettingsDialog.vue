@@ -117,7 +117,7 @@
             </div>
           </div>
 
-          <div v-else class="space-y-6">
+          <div v-else-if="activeSection === 'admin' && props.canViewAdmin" class="space-y-6">
             <h3 class="text-2xl font-semibold text-(--color-on-surface)">
               {{ t('settings.admin.title') }}
             </h3>
@@ -141,7 +141,7 @@ import { setLocale, type AppLocale } from '@/app/i18n'
 import { useAppTheme, type AppTheme } from '@/app/theme/useAppTheme'
 import { motion } from 'motion-v'
 import Dialog from 'primevue/dialog'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 type SettingsSection = 'theme' | 'language' | 'security' | 'admin'
@@ -164,17 +164,27 @@ type LanguageOption = {
 }
 
 const visible = defineModel<boolean>('visible', { required: true })
+const props = withDefaults(
+  defineProps<{
+    canViewAdmin?: boolean
+  }>(),
+  {
+    canViewAdmin: false,
+  },
+)
 const { locale, t } = useI18n()
 const { setTheme, theme } = useAppTheme()
 
 const activeSection = ref<SettingsSection>('theme')
 
-const settingsSections: SettingsTab[] = [
+const settingsSections = computed<SettingsTab[]>(() => [
   { id: 'theme', icon: 'pi pi-palette', titleKey: 'settings.tabs.theme' },
   { id: 'language', icon: 'pi pi-language', titleKey: 'settings.tabs.language' },
   { id: 'security', icon: 'pi pi-shield', titleKey: 'settings.tabs.security' },
-  { id: 'admin', icon: 'pi pi-server', titleKey: 'settings.tabs.admin' },
-]
+  ...(props.canViewAdmin
+    ? ([{ id: 'admin', icon: 'pi pi-server', titleKey: 'settings.tabs.admin' }] as const)
+    : []),
+])
 
 const themeOptions: ThemeOption[] = [
   { icon: 'pi pi-sun', labelKey: 'settings.theme.light', value: 'light' },
@@ -218,6 +228,15 @@ const dialogPassThrough = {
 const setActiveSection = (section: SettingsSection): void => {
   activeSection.value = section
 }
+
+watch(
+  () => props.canViewAdmin,
+  (canViewAdmin) => {
+    if (!canViewAdmin && activeSection.value === 'admin') {
+      activeSection.value = 'theme'
+    }
+  },
+)
 </script>
 
 <style scoped></style>
