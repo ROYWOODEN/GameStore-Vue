@@ -10,7 +10,7 @@ import type { AuthSession, LoginPayload, OAuthProvider, RegisterPayload } from '
 export const useAuth = () => {
   const router = useRouter()
   const authStore = useAuthStore()
-  const { accessToken, isAuthenticated } = storeToRefs(authStore)
+  const { accessToken, isAuthenticated, isSessionInitialized } = storeToRefs(authStore)
 
   const isLoading = ref(false)
   const authError = ref<ApiError | null>(null)
@@ -30,7 +30,7 @@ export const useAuth = () => {
   }
 
   const login = async (payload: LoginPayload): Promise<AuthSession> => {
-    return await runAuthAction(async () => {
+    return await runAuthAction(async (): Promise<AuthSession> => {
       const session = await fetchLogin(payload)
       authStore.setAccessToken(session.accessToken)
       return session
@@ -38,7 +38,7 @@ export const useAuth = () => {
   }
 
   const register = async (payload: RegisterPayload): Promise<AuthSession> => {
-    return await runAuthAction(async () => {
+    return await runAuthAction(async (): Promise<AuthSession> => {
       const session = await fetchRegister(payload)
       authStore.setAccessToken(session.accessToken)
       return session
@@ -83,10 +83,11 @@ export const useAuth = () => {
     continueWithOAuth,
     authError,
     isAuthenticated,
+    isSessionInitialized,
     isLoading,
     login,
+    markSessionInitialized: authStore.markSessionInitialized,
     register,
     setAccessToken: authStore.setAccessToken,
-    setSession: authStore.setSession,
   }
 }

@@ -49,24 +49,24 @@
       </button>
     </nav>
   </aside>
-  <SettingsDialog v-model:visible="settingsVisible" />
+  <SettingsDialog v-model:visible="settingsVisible" :can-view-admin="user?.role === 'admin'" />
 </template>
 
 <script setup lang="ts">
 import { useAuth } from '@/modules/auth'
 import { SettingsDialog } from '@/modules/setting'
-import { toApiError } from '@/shared/api/error'
+import { useUser } from '@/modules/user'
+import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, type RouteLocationRaw } from 'vue-router'
-import { useToast } from 'primevue/usetoast'
-import { useI18nMessage } from '@/shared/lib/useI18nMessage'
+
+const { clearCurrentUser, user } = useUser()
 
 const route = useRoute()
 const { isAuthenticated } = useAuth()
-const { getMessage } = useI18nMessage()
+const { showApiError } = useApiErrorToast()
 const { t } = useI18n()
-const toast = useToast()
 const { logout } = useAuth()
 const settingsVisible = ref<boolean>(false)
 
@@ -118,14 +118,9 @@ const handleBottomMenuClick = (itemId: BottomMenuItemId): void => {
 const handleLogout = async (): Promise<void> => {
   try {
     await logout()
+    clearCurrentUser()
   } catch (error: unknown) {
-    const apiError = toApiError(error)
-    toast.add({
-      severity: 'error',
-      summary: t('errors.title'),
-      detail: getMessage(apiError.message),
-      life: 3000,
-    })
+    showApiError(error)
   }
 }
 </script>

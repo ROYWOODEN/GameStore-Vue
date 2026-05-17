@@ -65,6 +65,35 @@
           :label="t('header.login')"
           @click="openAuthDialog('login')"
         />
+        <RouterLink
+          v-else
+          to="/profile"
+          class="group/profile flex h-12 max-w-70 min-w-0 items-center gap-3 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) py-1.5 pr-3 pl-1.5 text-left text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
+          :aria-label="profileLabel"
+        >
+          <span
+            class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-(--color-outline-variant) bg-(--color-menu-active-bg) text-sm font-bold text-(--color-primary)"
+          >
+            <img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              :alt="profileLabel"
+              class="h-full w-full object-cover"
+            />
+            <span v-else>{{ userInitials }}</span>
+          </span>
+
+          <span class="hidden min-w-0 flex-col leading-tight min-[1180px]:flex">
+            <span class="truncate text-sm font-semibold">{{ profileName }}</span>
+            <span
+              class="truncate text-xs text-(--color-on-surface-variant) group-hover/profile:text-(--color-primary)"
+            >
+              {{ user?.email }}
+            </span>
+          </span>
+
+          <VueIcon name="bs:chevron-right" class="hidden shrink-0 text-sm min-[1180px]:block" />
+        </RouterLink>
       </div>
     </div>
   </header>
@@ -74,22 +103,33 @@
 import { setLocale, type AppLocale } from '@/app/i18n'
 import { useAppTheme } from '@/app/theme/useAppTheme'
 import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useUser } from '@/modules/user'
+import { buildAssetUrl } from '@/shared/lib/url'
+import { getUserDisplayName, getUserInitials } from '@/shared/lib/user'
 import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { locale, t } = useI18n()
 const { isDark, toggleTheme } = useAppTheme()
 const { openAuthDialog } = useAuthDialog()
 const { isAuthenticated } = useAuth()
+const { user } = useUser()
 
 const search = ref('')
 const searchLoading = ref(false)
 let searchTimer: ReturnType<typeof setTimeout> | undefined
+
+const avatarUrl = computed(() =>
+  buildAssetUrl(user.value?.avatar_url, import.meta.env.VITE_API_URL),
+)
+const profileName = computed(() => getUserDisplayName(user.value, t('profile.fallbackName')))
+const profileLabel = computed(() => t('profile.openProfile', { name: profileName.value }))
+const userInitials = computed(() => getUserInitials(user.value))
 
 watch(search, (value) => {
   if (searchTimer) {

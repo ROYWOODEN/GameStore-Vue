@@ -97,3 +97,35 @@ body {
   stroke: var(--color-primary);
   animation: none;
 }
+
+.profile-confirm-cancel-button {
+  border-color: var(--color-outline-variant) !important;
+  background: transparent !important;
+  color: var(--color-on-surface-variant) !important;
+}
+
+.profile-confirm-cancel-button:hover {
+  border-color: var(--color-outline) !important;
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.profile-confirm-delete-button {
+  border-color: color-mix(in srgb, var(--color-error) 68%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-error) 18%,
+    var(--color-surface-container-high)
+  ) !important;
+  color: var(--color-error) !important;
+}
+
+.profile-confirm-delete-button:hover {
+  border-color: var(--color-error) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-error) 26%,
+    var(--color-surface-container-high)
+  ) !important;
+  color: var(--color-error) !important;
+}

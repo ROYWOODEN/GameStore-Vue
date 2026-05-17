@@ -2,10 +2,13 @@ import { z } from 'zod'
 
 type Translate = (key: string) => string
 
-const createEmailSchema = (t: Translate) =>
+export const createEmailSchema = (t: Translate) =>
   z.string().trim().min(1, t('auth.validation.required')).email(t('auth.validation.email'))
 
-const createPasswordSchema = (t: Translate) =>
+export const createNameSchema = (t: Translate) =>
+  z.string().trim().min(1, t('auth.validation.required')).min(3, t('auth.validation.nameMin'))
+
+export const createPasswordSchema = (t: Translate) =>
   z
     .string()
     .min(1, t('auth.validation.required'))
@@ -21,9 +24,5 @@ export const createLoginSchema = (t: Translate) =>
 
 export const createRegisterSchema = (t: Translate) =>
   createLoginSchema(t).extend({
-    name: z
-      .string()
-      .trim()
-      .min(1, t('auth.validation.required'))
-      .min(3, t('auth.validation.nameMin')),
+    name: createNameSchema(t),
   })

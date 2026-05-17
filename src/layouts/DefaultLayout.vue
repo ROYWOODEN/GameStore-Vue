@@ -13,32 +13,32 @@
 
 <script setup lang="ts">
 import { useAuth } from '@/modules/auth'
-import { toApiError } from '@/shared/api/error'
-import { useI18nMessage } from '@/shared/lib/useI18nMessage'
+import { useUser } from '@/modules/user'
+import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { PageLoader } from '@/shared/ui'
 import { AuthDialogHost } from '@/widgets/Auth'
 import { AppHeader } from '@/widgets/Header'
 import { AppSidebar } from '@/widgets/Sidebar'
-import { useToast } from 'primevue/usetoast'
 import { onMounted } from 'vue'
 
-const { refresh, isAuthenticated } = useAuth()
-const { getMessage } = useI18nMessage()
-const toast = useToast()
+const { refresh, isAuthenticated, markSessionInitialized, setAccessToken } = useAuth()
+const { showApiError } = useApiErrorToast()
+const { clearCurrentUser, loadCurrentUser } = useUser()
 
 const initializeSession = async () => {
-  if (!isAuthenticated.value) {
-    try {
+  try {
+    if (!isAuthenticated.value) {
       await refresh()
-    } catch (error: unknown) {
-      const ApiError = toApiError(error)
-      toast.add({
-        severity: 'error',
-        summary: getMessage(`errors.types.${ApiError.type}`),
-        detail: getMessage(ApiError.message),
-        life: 3000,
-      })
+      if (isAuthenticated.value) {
+        await loadCurrentUser()
+      }
     }
+  } catch (error: unknown) {
+    setAccessToken(null)
+    clearCurrentUser()
+    showApiError(error)
+  } finally {
+    markSessionInitialized()
   }
 }
 

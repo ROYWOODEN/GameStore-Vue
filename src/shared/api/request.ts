@@ -7,11 +7,26 @@ export const apiRequest = async <TData, TDetails = null>(
 ): Promise<TData> => {
   try {
     const response = await request
-    if (response.data.success) {
-      return response.data.data
+    if (response.status === 204) {
+      return undefined as TData
     }
 
-    throw response.data.error
+    const body = response.data
+    if (body?.success === true) {
+      return body.data
+    }
+
+    if (body?.success === false) {
+      throw body.error
+    }
+
+    throw {
+      statusCode: response.status,
+      statusText: response.statusText,
+      type: 'UnknownError',
+      message: 'errors.internal',
+      details: null,
+    } satisfies ApiError
   } catch (error) {
     if (axios.isAxiosError<ApiResponse<never, TDetails>>(error)) {
       const body = error.response?.data

@@ -50,31 +50,24 @@
 
 <script setup lang="ts">
 import { GameCardItem, useGames } from '@/modules/game'
-import { toApiError } from '@/shared/api/error'
+import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { AnimatePresence, motion } from 'motion-v'
-import { useToast } from 'primevue/usetoast'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const toast = useToast()
 const { t } = useI18n()
 
 const { getGames, games, isLoading, loadError } = useGames()
 
+const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
 const loadGames = async () => {
   try {
     await getGames()
   } catch (error: unknown) {
-    const ApiError = toApiError(error)
-    toast.add({
-      severity: 'error',
-      summary: getMessage(`errors.types.${ApiError.type}`),
-      detail: getMessage(ApiError.message),
-      life: 3000,
-    })
+    showApiError(error)
   }
 }
 

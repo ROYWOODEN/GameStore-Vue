@@ -1,0 +1,6 @@
+export { useUser } from './composables/useUser'
+export { default as UserAccountActions } from './ui/UserAccountActions.vue'
+export { default as UserAdminPanel } from './ui/UserAdminPanel.vue'
+export { default as UserPreferencesPanel } from './ui/UserPreferencesPanel.vue'
+export { default as UserProfileForm } from './ui/UserProfileForm.vue'
+export { default as UserSecurityPanel } from './ui/UserSecurityPanel.vue'

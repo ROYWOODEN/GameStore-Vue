@@ -14,11 +14,13 @@
 import type { AuthSession, LoginPayload, RegisterPayload } from '@/modules/auth'
 import { useAuth, useAuthDialog } from '@/modules/auth'
 import { AuthDialog } from '@/modules/auth'
+import { useUser } from '@/modules/user'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { computed, watch } from 'vue'
 
 const { initialMode, closeAuthDialog, visible } = useAuthDialog()
 const { clearError, continueWithGoogle, authError, isLoading, login, register } = useAuth()
+const { setCurrentUser } = useUser()
 const { getMessage } = useI18nMessage()
 
 const resolvedErrorMessage = computed(() => {
@@ -43,10 +45,20 @@ const runAndClose = async (
 
 const handleLogin = async (payload: LoginPayload): Promise<void> => {
   const session = await runAndClose(() => login(payload))
+  if (!session) {
+    return
+  }
+
+  setCurrentUser(session.user)
 }
 
 const handleRegister = async (payload: RegisterPayload): Promise<void> => {
   const session = await runAndClose(() => register(payload))
+  if (!session) {
+    return
+  }
+
+  setCurrentUser(session.user)
 }
 
 const handleGoogle = async (): Promise<void> => {

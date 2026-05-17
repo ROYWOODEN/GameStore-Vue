@@ -2,6 +2,7 @@ import '@/app/styles/index.css'
 import VueIcon from '@kalimahapps/vue-icons/VueIcon'
 import { createPinia } from 'pinia'
 import 'primeicons/primeicons.css'
+import ConfirmationService from 'primevue/confirmationservice'
 import PrimeVue from 'primevue/config'
 import { createApp } from 'vue'
 import ToastService from 'primevue/toastservice'
@@ -25,6 +26,7 @@ app.use(PrimeVue, {
   },
 })
 app.use(i18n)
+app.use(ConfirmationService)
 app.use(ToastService)
 
 app.mount('#app')

@@ -1,3 +1,5 @@
+import type { User, UserRole } from '@/shared/types/user'
+
 export type AuthMode = 'login' | 'register'
 
 export type OAuthProvider = 'google'
@@ -11,15 +13,8 @@ export interface RegisterPayload extends LoginPayload {
   name: string
 }
 
-export interface AuthUser {
-  id: number | string
-  email: string
-  name: string
-  avatar_url?: string | null
-  created_at: string
-  role: AuthRole
-}
-export type AuthRole = 'admin' | 'user'
+export type AuthUser = User
+export type AuthRole = UserRole
 
 export interface AuthTokenSession {
   accessToken: string
