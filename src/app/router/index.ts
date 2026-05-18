@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { fetchRefresh } from '@/modules/auth/api/auth.api'
 import { useAuthStore } from '@/modules/auth/stores/auth.store'
+import { useUserStore } from '@/modules/user/stores/user.store'
 import MainPage from '@/pages/MainPage/MainPage.vue'
 import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue'
 
@@ -30,16 +30,22 @@ router.beforeEach(async (to) => {
   }
 
   const authStore = useAuthStore()
+  const userStore = useUserStore()
   if (authStore.isAuthenticated) {
     return true
   }
 
   try {
-    const session = await fetchRefresh()
-    authStore.setAccessToken(session.accessToken)
+    const hasSession = await authStore.refreshSession()
+    if (!hasSession) {
+      userStore.clearCurrentUser()
+      authStore.markSessionInitialized()
+      return { name: 'main' }
+    }
+
     return true
   } catch {
-    authStore.clearSession()
+    userStore.clearCurrentUser()
     authStore.markSessionInitialized()
     return { name: 'main' }
   }

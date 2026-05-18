@@ -1,7 +1,6 @@
 import { toApiError } from '@/shared/api/error'
 import { storeToRefs } from 'pinia'
 import {
-  fetchCurrentUser,
   fetchDeleteCurrentUser,
   fetchDeleteCurrentUserAvatar,
   fetchUpdateCurrentUser,
@@ -16,8 +15,7 @@ export const useUser = () => {
 
   const loadCurrentUser = async (): Promise<void> => {
     try {
-      const res = await fetchCurrentUser()
-      userStore.setCurrentUser(res)
+      await userStore.loadCurrentUser()
     } catch (error: unknown) {
       const apiError = toApiError(error)
       throw apiError

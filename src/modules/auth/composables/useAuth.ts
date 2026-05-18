@@ -3,7 +3,7 @@ import { toApiError } from '@/shared/api/error'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchLogin, fetchLogout, fetchRefresh, fetchRegister } from '../api/auth.api'
+import { fetchLogin, fetchLogout, fetchRegister } from '../api/auth.api'
 import { useAuthStore } from '../stores/auth.store'
 import type { AuthSession, LoginPayload, OAuthProvider, RegisterPayload } from '../types/auth'
 
@@ -52,8 +52,7 @@ export const useAuth = () => {
   }
   const refresh = async () => {
     try {
-      const session = await fetchRefresh()
-      authStore.setAccessToken(session.accessToken)
+      await authStore.refreshSession()
     } catch (error: unknown) {
       const apiError = toApiError(error)
       throw apiError
