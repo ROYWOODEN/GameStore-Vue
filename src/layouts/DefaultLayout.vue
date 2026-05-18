@@ -21,16 +21,23 @@ import { AppHeader } from '@/widgets/Header'
 import { AppSidebar } from '@/widgets/Sidebar'
 import { onMounted } from 'vue'
 
-const { refresh, isAuthenticated, markSessionInitialized, setAccessToken } = useAuth()
+const { refresh, isAuthenticated, isSessionInitialized, markSessionInitialized, setAccessToken } =
+  useAuth()
 const { showApiError } = useApiErrorToast()
 const { clearCurrentUser, loadCurrentUser } = useUser()
 
 const initializeSession = async () => {
+  if (isSessionInitialized.value) {
+    return
+  }
+
   try {
     if (!isAuthenticated.value) {
       await refresh()
       if (isAuthenticated.value) {
         await loadCurrentUser()
+      } else {
+        clearCurrentUser()
       }
     }
   } catch (error: unknown) {

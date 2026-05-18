@@ -17,7 +17,7 @@ export type AuthUser = User
 export type AuthRole = UserRole
 
 export interface AuthTokenSession {
-  accessToken: string
+  accessToken: string | null
 }
 
 export interface AuthSession extends AuthTokenSession {
