@@ -10,5 +10,4 @@ export type {
   OAuthProvider,
   RegisterPayload,
 } from './types/auth'
-
 export { default as AuthDialog } from './ui/AuthDialog.vue'

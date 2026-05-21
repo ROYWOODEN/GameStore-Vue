@@ -4,7 +4,9 @@
   >
     <PageLoader v-if="isLoading" />
     <section v-else-if="games.length > 0">
-      <div class="grid auto-rows-fr grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-5">
+      <div
+        class="grid auto-rows-fr grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),20rem))] justify-center gap-5"
+      >
         <AnimatePresence>
           <motion.div
             v-for="game in games"
@@ -21,7 +23,12 @@
               scale: { duration: 0.18, ease: 'easeOut' },
             }"
           >
-            <GameCardItem :game="game" />
+            <GameCardItem
+              :game="game"
+              :is-favorite="favoriteIdSet.has(game.id)"
+              :is-favorite-pending="pendingFavoriteIdSet.has(game.id)"
+              @favorite-toggle="handleFavoriteToggle"
+            />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -31,7 +38,7 @@
       :title="t('mainPage.loadErrorTitle')"
       :message="getMessage(loadError.message)"
       :action-label="t('mainPage.retry')"
-      @retry="loadGames"
+      @retry="handleRetry"
     />
     <section v-else>
       <div
@@ -49,27 +56,79 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
 import { GameCardItem, useGames } from '@/modules/game'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { AnimatePresence, motion } from 'motion-v'
-import { onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const { getGames, games, isLoading, loadError } = useGames()
+const { isAuthenticated, isSessionInitialized } = useAuth()
+const { openAuthDialog } = useAuthDialog()
+const { clearFavorites, favoriteIds, getFavoriteIds, pendingFavoriteIds, toggleFavorite } =
+  useFavorites()
 
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
-const loadGames = async () => {
+
+const favoriteIdSet = computed(() => new Set(favoriteIds.value))
+const pendingFavoriteIdSet = computed(() => new Set(pendingFavoriteIds.value))
+
+const loadMainPage = async (): Promise<void> => {
   try {
     await getGames()
+
+    if (isAuthenticated.value) {
+      await getFavoriteIds()
+    } else {
+      clearFavorites()
+    }
   } catch (error: unknown) {
     showApiError(error)
   }
 }
 
-onMounted(() => loadGames())
+const handleRetry = (): void => {
+  loadMainPage()
+}
+
+const handleFavoriteToggle = async (game: { id: FavoriteGameId }): Promise<void> => {
+  if (!isAuthenticated.value) {
+    openAuthDialog('login')
+    return
+  }
+
+  try {
+    await toggleFavorite(game.id, favoriteIdSet.value.has(game.id))
+  } catch (error: unknown) {
+    showApiError(error)
+  }
+}
+
+onMounted(() => {
+  loadMainPage()
+})
+
+watch(isAuthenticated, async (authenticated) => {
+  if (!isSessionInitialized.value) {
+    return
+  }
+
+  if (!authenticated) {
+    clearFavorites()
+    return
+  }
+
+  try {
+    await getFavoriteIds()
+  } catch (error: unknown) {
+    showApiError(error)
+  }
+})
 </script>

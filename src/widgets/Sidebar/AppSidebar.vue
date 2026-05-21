@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { useAuth } from '@/modules/auth'
+import { useFavorites } from '@/modules/favorite'
 import { SettingsDialog } from '@/modules/setting'
 import { useUser } from '@/modules/user'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
@@ -68,6 +69,7 @@ const { isAuthenticated } = useAuth()
 const { showApiError } = useApiErrorToast()
 const { t } = useI18n()
 const { logout } = useAuth()
+const { clearFavorites } = useFavorites()
 const settingsVisible = ref<boolean>(false)
 
 type BottomMenuItemId = 'settings' | 'exit'
@@ -119,6 +121,7 @@ const handleLogout = async (): Promise<void> => {
   try {
     await logout()
     clearCurrentUser()
+    clearFavorites()
   } catch (error: unknown) {
     showApiError(error)
   }

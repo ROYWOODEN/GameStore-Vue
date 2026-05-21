@@ -1,4 +1,5 @@
 export { useUser } from './composables/useUser'
+export { useUserStore } from './stores/user.store'
 export { default as UserAccountActions } from './ui/UserAccountActions.vue'
 export { default as UserAdminPanel } from './ui/UserAdminPanel.vue'
 export { default as UserPreferencesPanel } from './ui/UserPreferencesPanel.vue'

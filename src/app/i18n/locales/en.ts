@@ -7,6 +7,7 @@ export const en = {
   game: {
     addToCart: 'Add',
     addToFavorites: 'Add to favorites',
+    removeFromFavorites: 'Remove from favorites',
     coverPlaceholder: 'Game cover is missing',
     platforms: 'Platforms',
   },
@@ -14,6 +15,12 @@ export const en = {
     emptyDescription: 'Try again later: the catalog will appear soon.',
     emptyTitle: 'No games yet',
     loadErrorTitle: 'Failed to load games',
+    retry: 'Retry',
+  },
+  favoritesPage: {
+    emptyDescription: 'Saved games will be waiting here.',
+    emptyTitle: 'No favorites yet',
+    loadErrorTitle: 'Failed to load favorites',
     retry: 'Retry',
   },
   errors: {
