@@ -46,11 +46,35 @@
         ></div>
         <button
           class="absolute top-3 left-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/30 bg-black/55 text-lg text-white backdrop-blur-sm transition-colors hover:border-(--color-primary) hover:bg-(--color-primary) hover:text-(--color-on-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-primary)"
+          :class="[
+            isFavorite
+              ? 'border-(--color-primary)! bg-(--color-primary)! text-(--color-on-primary)! shadow-[0_0_0_4px_var(--color-menu-active-bg)] hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)!'
+              : 'hover:border-(--color-primary) hover:bg-(--color-primary) hover:text-(--color-on-primary)',
+            isFavoritePending ? 'cursor-wait! opacity-85' : '',
+          ]"
           type="button"
-          :aria-label="t('game.addToFavorites')"
+          :aria-label="favoriteLabel"
+          :aria-pressed="isFavorite"
+          :disabled="isFavoritePending"
           @click.stop="emit('favoriteToggle', { id: game.id })"
         >
-          <VueIcon name="bs:heart" />
+          <motion.span
+            v-if="isFavorite"
+            class="absolute inset-1 rounded-full bg-[color-mix(in_srgb,var(--color-primary)_34%,transparent)]"
+            :initial="{ scale: 0.35, opacity: 0.8 }"
+            :animate="{ scale: 1.7, opacity: 0 }"
+            :transition="{ duration: 0.48, ease: 'easeOut' }"
+          />
+          <motion.span
+            :key="favoriteIconKey"
+            class="relative z-10 flex"
+            :initial="{ scale: 0.55, rotate: -16, opacity: 0 }"
+            :animate="{ scale: 1, rotate: 0, opacity: 1 }"
+            :transition="{ type: 'spring', stiffness: 520, damping: 19 }"
+          >
+            <i v-if="isFavoritePending" class="pi pi-spin pi-spinner text-base" />
+            <VueIcon v-else :name="favoriteIconName" />
+          </motion.span>
         </button>
         <span
           v-if="ageTag"
@@ -129,18 +153,26 @@
 </template>
 
 <script setup lang="ts">
-import type { GameListItem } from '@/modules/game'
 import { buildAssetUrl } from '@/shared/lib/url'
+import { motion } from 'motion-v'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { GameTag, GameTagType } from '../types/game'
+import type { GameListItem, GameTag, GameTagType } from '../types/game'
 
-const props = defineProps<{
-  game: GameListItem
-}>()
+const props = withDefaults(
+  defineProps<{
+    game: GameListItem
+    isFavorite?: boolean
+    isFavoritePending?: boolean
+  }>(),
+  {
+    isFavorite: false,
+    isFavoritePending: false,
+  },
+)
 
 const emit = defineEmits<{
   favoriteToggle: [game: Pick<GameListItem, 'id'>]
@@ -161,6 +193,13 @@ const coverImageAlt = computed(() => coverImage.value?.alt || props.game.title)
 
 const ageTag = computed(() => props.game.tags.find((tag) => tag.type === 'age'))
 const platformTags = computed(() => props.game.tags.filter((tag) => tag.type === 'platforma'))
+const favoriteIconName = computed(() => (props.isFavorite ? 'bs:heart-fill' : 'bs:heart'))
+const favoriteIconKey = computed(() =>
+  props.isFavoritePending ? 'favorite-pending' : favoriteIconName.value,
+)
+const favoriteLabel = computed(() =>
+  props.isFavorite ? t('game.removeFromFavorites') : t('game.addToFavorites'),
+)
 
 const platformIcons: Record<string, string> = {
   windows: 'bs:windows',

@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { useAuthStore } from '@/modules/auth/stores/auth.store'
-import { useUserStore } from '@/modules/user/stores/user.store'
+import { useAuthStore } from '@/modules/auth'
+import { useUserStore } from '@/modules/user'
+import FavoritesPage from '@/pages/FavoritesPage/FavoritesPage.vue'
 import MainPage from '@/pages/MainPage/MainPage.vue'
 import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior() {
+    return { left: 0, top: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -17,6 +21,14 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfilePage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: FavoritesPage,
       meta: {
         requiresAuth: true,
       },

@@ -5,6 +5,7 @@ export const ru = {
   game: {
     addToCart: 'Добавить',
     addToFavorites: 'Добавить в избранное',
+    removeFromFavorites: 'Удалить из избранного',
     coverPlaceholder: 'Обложка игры отсутствует',
     platforms: 'Платформы',
   },
@@ -12,6 +13,12 @@ export const ru = {
     emptyDescription: 'Попробуйте зайти позже: каталог скоро появится.',
     emptyTitle: 'Игр пока нет',
     loadErrorTitle: 'Не удалось загрузить игры',
+    retry: 'Повторить',
+  },
+  favoritesPage: {
+    emptyDescription: 'Сохраненные игры будут ждать вас здесь.',
+    emptyTitle: 'В избранном пока пусто',
+    loadErrorTitle: 'Не удалось загрузить избранное',
     retry: 'Повторить',
   },
   errors: {
