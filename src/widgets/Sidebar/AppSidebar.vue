@@ -54,7 +54,9 @@
 
 <script setup lang="ts">
 import { useAuth } from '@/modules/auth'
+import { useBasket } from '@/modules/basket'
 import { useFavorites } from '@/modules/favorite'
+import { useCheckoutPayment } from '@/modules/payment'
 import { SettingsDialog } from '@/modules/setting'
 import { useUser } from '@/modules/user'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
@@ -70,6 +72,8 @@ const { showApiError } = useApiErrorToast()
 const { t } = useI18n()
 const { logout } = useAuth()
 const { clearFavorites } = useFavorites()
+const { clearBasketState } = useBasket()
+const { clearPaymentState } = useCheckoutPayment()
 const settingsVisible = ref<boolean>(false)
 
 type BottomMenuItemId = 'settings' | 'exit'
@@ -122,6 +126,8 @@ const handleLogout = async (): Promise<void> => {
     await logout()
     clearCurrentUser()
     clearFavorites()
+    clearBasketState()
+    clearPaymentState()
   } catch (error: unknown) {
     showApiError(error)
   }

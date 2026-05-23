@@ -27,6 +27,9 @@
               :game="game"
               :is-favorite="favoriteIdSet.has(game.id)"
               :is-favorite-pending="pendingFavoriteIdSet.has(game.id)"
+              :is-in-basket="basketIdSet.has(game.id)"
+              :is-basket-pending="pendingBasketIdSet.has(game.id)"
+              @basket-toggle="handleBasketToggle"
               @favorite-toggle="handleFavoriteToggle"
             />
           </motion.div>
@@ -57,6 +60,7 @@
 
 <script setup lang="ts">
 import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useBasket, type BasketGame } from '@/modules/basket'
 import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
 import { GameCardItem, useGames } from '@/modules/game'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
@@ -73,22 +77,57 @@ const { isAuthenticated, isSessionInitialized } = useAuth()
 const { openAuthDialog } = useAuthDialog()
 const { clearFavorites, favoriteIds, getFavoriteIds, pendingFavoriteIds, toggleFavorite } =
   useFavorites()
+const {
+  basketIds,
+  clearBasketState,
+  getBasketIds,
+  hasBasketIdsLoaded,
+  isBasketIdsLoading,
+  pendingBasketIds,
+  toggleBasketItem,
+} = useBasket()
 
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
 
 const favoriteIdSet = computed(() => new Set(favoriteIds.value))
 const pendingFavoriteIdSet = computed(() => new Set(pendingFavoriteIds.value))
+const basketIdSet = computed(() => new Set(basketIds.value))
+const pendingBasketIdSet = computed(() => new Set(pendingBasketIds.value))
+let userMarksLoaded = false
+
+const loadBasketIdsIfNeeded = async (): Promise<void> => {
+  if (hasBasketIdsLoaded.value || isBasketIdsLoading.value) {
+    return
+  }
+
+  await getBasketIds()
+}
+
+const loadUserMarks = async (): Promise<void> => {
+  if (!isSessionInitialized.value) {
+    return
+  }
+
+  if (!isAuthenticated.value) {
+    userMarksLoaded = false
+    clearFavorites()
+    clearBasketState()
+    return
+  }
+
+  if (userMarksLoaded) {
+    return
+  }
+
+  await Promise.all([getFavoriteIds(), loadBasketIdsIfNeeded()])
+  userMarksLoaded = true
+}
 
 const loadMainPage = async (): Promise<void> => {
   try {
     await getGames()
-
-    if (isAuthenticated.value) {
-      await getFavoriteIds()
-    } else {
-      clearFavorites()
-    }
+    await loadUserMarks()
   } catch (error: unknown) {
     showApiError(error)
   }
@@ -115,20 +154,35 @@ onMounted(() => {
   loadMainPage()
 })
 
-watch(isAuthenticated, async (authenticated) => {
-  if (!isSessionInitialized.value) {
+watch([isSessionInitialized, isAuthenticated], async ([sessionInitialized, authenticated]) => {
+  if (!sessionInitialized) {
     return
   }
 
   if (!authenticated) {
+    userMarksLoaded = false
     clearFavorites()
+    clearBasketState()
     return
   }
 
   try {
-    await getFavoriteIds()
+    await loadUserMarks()
   } catch (error: unknown) {
     showApiError(error)
   }
 })
+
+const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promise<void> => {
+  if (!isAuthenticated.value) {
+    openAuthDialog('login')
+    return
+  }
+
+  try {
+    await toggleBasketItem(game, basketIdSet.value.has(game.id))
+  } catch (error: unknown) {
+    showApiError(error)
+  }
+}
 </script>

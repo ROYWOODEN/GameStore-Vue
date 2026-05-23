@@ -4,7 +4,7 @@
     <AppSidebar />
     <AuthDialogHost />
     <slot>
-      <main class="ml-[20%] mt-20 min-h-[calc(100vh-5rem)] bg-(--color-background)">
+      <main class="ml-[20%] mt-20 min-h-[calc(100vh-5rem)] w-[80%] bg-(--color-background)">
         <PageLoader />
       </main>
     </slot>
@@ -34,11 +34,12 @@ const initializeSession = async () => {
   try {
     if (!isAuthenticated.value) {
       await refresh()
-      if (isAuthenticated.value) {
-        await loadCurrentUser()
-      } else {
-        clearCurrentUser()
-      }
+    }
+
+    if (isAuthenticated.value) {
+      await loadCurrentUser()
+    } else {
+      clearCurrentUser()
     }
   } catch (error: unknown) {
     setAccessToken(null)

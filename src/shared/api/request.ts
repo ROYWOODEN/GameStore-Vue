@@ -1,19 +1,27 @@
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'
-import type { ApiError, ApiResponse } from './api'
+import type { ApiError, ApiMeta, ApiResponse } from './api'
 
-export const apiRequest = async <TData, TDetails = null>(
+export interface ApiRequestResult<TData> {
+  data: TData
+  meta?: ApiMeta
+}
+
+export const apiRequestWithMeta = async <TData, TDetails = null>(
   request: Promise<AxiosResponse<ApiResponse<TData, TDetails>>>,
-): Promise<TData> => {
+): Promise<ApiRequestResult<TData>> => {
   try {
     const response = await request
     if (response.status === 204) {
-      return undefined as TData
+      return { data: undefined as TData }
     }
 
     const body = response.data
     if (body?.success === true) {
-      return body.data
+      return {
+        data: body.data,
+        meta: body.meta,
+      }
     }
 
     if (body?.success === false) {
@@ -45,4 +53,11 @@ export const apiRequest = async <TData, TDetails = null>(
     }
     throw error
   }
+}
+
+export const apiRequest = async <TData, TDetails = null>(
+  request: Promise<AxiosResponse<ApiResponse<TData, TDetails>>>,
+): Promise<TData> => {
+  const result = await apiRequestWithMeta<TData, TDetails>(request)
+  return result.data
 }

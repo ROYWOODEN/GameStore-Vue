@@ -2,7 +2,7 @@
   <DefaultLayout>
     <ConfirmDialog />
     <Toast />
-    <router-view class="ml-[20%] mt-18" />
+    <router-view class="ml-[20%] mt-18 w-[80%] min-w-0" />
   </DefaultLayout>
 </template>
 
