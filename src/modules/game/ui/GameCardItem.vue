@@ -124,7 +124,7 @@
           <div
             class="text-[1.15rem] leading-none font-bold text-(--color-on-surface) min-[560px]:text-[1.35rem]"
           >
-            ${{ game.price }}
+            {{ formattedPrice }}
           </div>
 
           <div class="flex items-center gap-1.5" :aria-label="t('game.platforms')">
@@ -140,12 +140,36 @@
         </div>
 
         <Button
-          class="min-w-28 justify-center! gap-1.5! rounded-lg! border-(--color-primary)! bg-(--color-primary)! px-3! py-2.5! text-[0.875rem]! font-semibold! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!"
+          :class="[
+            'min-w-28 justify-center! gap-1.5! rounded-lg! px-3! py-2.5! text-[0.875rem]! font-semibold! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!',
+            isInBasket
+              ? 'border-(--color-primary)! bg-(--color-surface-container-high)! text-(--color-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-surface-container-highest)!'
+              : 'border-(--color-primary)! bg-(--color-primary)! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)!',
+            isBasketPending ? 'cursor-wait! opacity-85' : '',
+          ]"
           type="button"
-          :aria-label="t('game.addToCart')"
+          :aria-label="basketLabel"
+          :disabled="isBasketPending"
+          @click.stop="emit('basketToggle', { id: game.id, price: game.price })"
         >
-          <VueIcon name="bs:cart-plus" class="text-[1.25rem] min-[560px]:text-[1.45rem]" />
-          <span>{{ t('game.addToCart') }}</span>
+          <AnimatePresence mode="wait">
+            <motion.span
+              :key="basketIconKey"
+              class="flex"
+              :initial="{ opacity: 0, y: 8, scale: 0.92 }"
+              :animate="{ opacity: 1, y: 0, scale: 1 }"
+              :exit="{ opacity: 0, y: -8, scale: 0.92 }"
+              :transition="{ duration: 0.16, ease: 'easeOut' }"
+            >
+              <i v-if="isBasketPending" class="pi pi-spin pi-spinner text-base" />
+              <VueIcon
+                v-else
+                :name="basketIconName"
+                class="text-[1.25rem] min-[560px]:text-[1.45rem]"
+              />
+            </motion.span>
+          </AnimatePresence>
+          <span>{{ basketButtonText }}</span>
         </Button>
       </div>
     </template>
@@ -154,7 +178,8 @@
 
 <script setup lang="ts">
 import { buildAssetUrl } from '@/shared/lib/url'
-import { motion } from 'motion-v'
+import { formatRubPrice } from '@/shared/lib/price'
+import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
@@ -167,14 +192,19 @@ const props = withDefaults(
     game: GameListItem
     isFavorite?: boolean
     isFavoritePending?: boolean
+    isInBasket?: boolean
+    isBasketPending?: boolean
   }>(),
   {
+    isBasketPending: false,
     isFavorite: false,
     isFavoritePending: false,
+    isInBasket: false,
   },
 )
 
 const emit = defineEmits<{
+  basketToggle: [game: Pick<GameListItem, 'id' | 'price'>]
   favoriteToggle: [game: Pick<GameListItem, 'id'>]
 }>()
 
@@ -190,6 +220,7 @@ const cardTags = computed(() =>
 const coverImage = computed(() => props.game.media.images[0])
 const coverImageUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverImageAlt = computed(() => coverImage.value?.alt || props.game.title)
+const formattedPrice = computed(() => formatRubPrice(props.game.price))
 
 const ageTag = computed(() => props.game.tags.find((tag) => tag.type === 'age'))
 const platformTags = computed(() => props.game.tags.filter((tag) => tag.type === 'platforma'))
@@ -199,6 +230,20 @@ const favoriteIconKey = computed(() =>
 )
 const favoriteLabel = computed(() =>
   props.isFavorite ? t('game.removeFromFavorites') : t('game.addToFavorites'),
+)
+const basketIconName = computed(() => (props.isInBasket ? 'bs:cart-check-fill' : 'bs:cart-plus'))
+const basketIconKey = computed(() =>
+  props.isBasketPending ? 'basket-pending' : basketIconName.value,
+)
+const basketButtonText = computed(() => {
+  if (props.isBasketPending) {
+    return t('game.cartUpdating')
+  }
+
+  return props.isInBasket ? t('game.inCart') : t('game.addToCart')
+})
+const basketLabel = computed(() =>
+  props.isInBasket ? t('game.removeFromCart') : t('game.addToCart'),
 )
 
 const platformIcons: Record<string, string> = {

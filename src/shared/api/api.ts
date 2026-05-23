@@ -25,4 +25,5 @@ export interface ApiError<TDetails = null> {
 }
 export interface ApiMeta {
   count: number
+  totalAmount?: string
 }

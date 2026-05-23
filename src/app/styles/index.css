@@ -129,3 +129,13 @@ body {
   ) !important;
   color: var(--color-error) !important;
 }
+
+@media (min-width: 1180px) {
+  .basket-page-aside {
+    position: sticky;
+    top: 6.5rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+}

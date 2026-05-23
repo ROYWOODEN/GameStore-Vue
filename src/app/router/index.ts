@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { useAuthStore } from '@/modules/auth'
 import { useUserStore } from '@/modules/user'
+import BasketPage from '@/pages/BasketPage/BasketPage.vue'
 import FavoritesPage from '@/pages/FavoritesPage/FavoritesPage.vue'
 import MainPage from '@/pages/MainPage/MainPage.vue'
 import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue'
@@ -29,6 +30,14 @@ const router = createRouter({
       path: '/favorites',
       name: 'favorites',
       component: FavoritesPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/basket',
+      name: 'basket',
+      component: BasketPage,
       meta: {
         requiresAuth: true,
       },

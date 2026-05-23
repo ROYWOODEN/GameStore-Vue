@@ -30,6 +30,9 @@
             :game="game"
             is-favorite
             :is-favorite-pending="pendingFavoriteIdSet.has(game.id)"
+            :is-in-basket="basketIdSet.has(game.id)"
+            :is-basket-pending="pendingBasketIdSet.has(game.id)"
+            @basket-toggle="handleBasketToggle"
             @favorite-toggle="handleFavoriteToggle"
           />
         </motion.div>
@@ -66,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { useBasket, type BasketGame } from '@/modules/basket'
 import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
 import { GameCardItem } from '@/modules/game'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
@@ -86,8 +90,11 @@ const {
   pendingFavoriteIds,
   removeFavorite,
 } = useFavorites()
+const { basketIds, pendingBasketIds, toggleBasketItem } = useBasket()
 
 const pendingFavoriteIdSet = computed(() => new Set(pendingFavoriteIds.value))
+const basketIdSet = computed(() => new Set(basketIds.value))
+const pendingBasketIdSet = computed(() => new Set(pendingBasketIds.value))
 
 const loadFavoritesPage = async (): Promise<void> => {
   try {
@@ -104,6 +111,14 @@ const handleRetry = (): void => {
 const handleFavoriteToggle = async (game: { id: FavoriteGameId }): Promise<void> => {
   try {
     await removeFavorite(game.id)
+  } catch (error: unknown) {
+    showApiError(error)
+  }
+}
+
+const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promise<void> => {
+  try {
+    await toggleBasketItem(game, basketIdSet.value.has(game.id))
   } catch (error: unknown) {
     showApiError(error)
   }

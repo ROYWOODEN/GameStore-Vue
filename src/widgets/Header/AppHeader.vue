@@ -52,10 +52,34 @@
           <VueIcon name="bs:bell" />
         </button>
 
+        <RouterLink
+          v-if="isAuthenticated"
+          to="/basket"
+          :class="cartButtonClass"
+          :aria-label="cartLabel"
+        >
+          <VueIcon name="bs:basket-3-fill" />
+          <AnimatePresence mode="popLayout">
+            <motion.span
+              v-if="basketCount > 0"
+              :key="basketCount"
+              class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-(--color-background) bg-(--color-primary) px-1 text-[0.7rem] leading-none font-extrabold text-(--color-on-primary) shadow-[0_6px_16px_rgb(189_0_255/0.35)]"
+              :initial="{ opacity: 0, y: 10 }"
+              :animate="{ opacity: 1, y: 0 }"
+              :exit="{ opacity: 0, y: -10 }"
+              :transition="{ duration: 0.18, ease: 'easeOut' }"
+            >
+              {{ displayBasketCount }}
+            </motion.span>
+          </AnimatePresence>
+        </RouterLink>
+
         <button
-          class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-xl text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
+          v-else
+          :class="cartButtonClass"
           type="button"
           :aria-label="t('header.cart')"
+          @click="openAuthDialog('login')"
         >
           <VueIcon name="bs:basket-3-fill" />
         </button>
@@ -106,6 +130,8 @@ import { useAuth, useAuthDialog } from '@/modules/auth'
 import { useUser } from '@/modules/user'
 import { buildAssetUrl } from '@/shared/lib/url'
 import { getUserDisplayName, getUserInitials } from '@/shared/lib/user'
+import { useBasketBadge } from '@/widgets/Header/composables/useBasketBadge'
+import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import IconField from 'primevue/iconfield'
@@ -118,6 +144,7 @@ const { locale, t } = useI18n()
 const { isDark, toggleTheme } = useAppTheme()
 const { openAuthDialog } = useAuthDialog()
 const { isAuthenticated } = useAuth()
+const { basketCount, cartLabel, displayBasketCount } = useBasketBadge()
 const { user } = useUser()
 
 const search = ref('')
@@ -130,6 +157,8 @@ const avatarUrl = computed(() =>
 const profileName = computed(() => getUserDisplayName(user.value, t('profile.fallbackName')))
 const profileLabel = computed(() => t('profile.openProfile', { name: profileName.value }))
 const userInitials = computed(() => getUserInitials(user.value))
+const cartButtonClass =
+  'relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-xl text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)'
 
 watch(search, (value) => {
   if (searchTimer) {
