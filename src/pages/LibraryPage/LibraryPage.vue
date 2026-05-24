@@ -11,6 +11,7 @@
         :pending-favorite-ids="pendingFavoriteIds"
         force-owned
         @favorite-toggle="handleFavoriteToggle"
+        @game-select="openGame"
       />
     </section>
 
@@ -52,8 +53,10 @@ import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
+const router = useRouter()
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
 const { favoriteIds, getFavoriteIds, pendingFavoriteIds, toggleFavorite } = useFavorites()
@@ -79,6 +82,10 @@ const handleFavoriteToggle = async (game: { id: FavoriteGameId }): Promise<void>
   } catch (error: unknown) {
     showApiError(error)
   }
+}
+
+const openGame = (id: string): void => {
+  router.push({ name: 'game-details', params: { id } })
 }
 
 onMounted(() => {

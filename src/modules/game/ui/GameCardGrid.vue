@@ -7,7 +7,10 @@
     <motion.div
       v-for="game in games"
       :key="game.id"
+      class="cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-primary)"
       layout="position"
+      role="button"
+      tabindex="0"
       :initial="{ opacity: 0, y: 28, scale: 0.96 }"
       :animate="{ opacity: 1, y: 0, scale: 1 }"
       :exit="{ opacity: 0, y: 16, scale: 0.92 }"
@@ -19,6 +22,9 @@
         y: { duration: 0.28, ease: 'easeOut' },
         scale: { duration: 0.18, ease: 'easeOut' },
       }"
+      @click="emit('gameSelect', game.id)"
+      @keydown.enter.prevent="emit('gameSelect', game.id)"
+      @keydown.space.prevent="emit('gameSelect', game.id)"
     >
       <GameCardItem
         :game="game"
@@ -65,6 +71,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   basketToggle: [game: Pick<GameListItem, 'id' | 'price'>]
   favoriteToggle: [game: Pick<GameListItem, 'id'>]
+  gameSelect: [id: GameId]
 }>()
 
 const basketIdSet = computed(() => new Set(props.basketIds))

@@ -14,6 +14,7 @@
         :owned-ids="libraryIds"
         @basket-toggle="handleBasketToggle"
         @favorite-toggle="handleFavoriteToggle"
+        @game-select="openGame"
       />
     </section>
 
@@ -56,8 +57,10 @@ import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
+const router = useRouter()
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
 const {
@@ -115,6 +118,10 @@ const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promi
   } catch (error: unknown) {
     showApiError(error)
   }
+}
+
+const openGame = (id: string): void => {
+  router.push({ name: 'game-details', params: { id } })
 }
 
 onMounted(() => {
