@@ -2,11 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { useAuthPromptStore, useAuthStore } from '@/modules/auth'
 import { useUserStore } from '@/modules/user'
-import BasketPage from '@/pages/BasketPage/BasketPage.vue'
-import FavoritesPage from '@/pages/FavoritesPage/FavoritesPage.vue'
-import LibraryPage from '@/pages/LibraryPage/LibraryPage.vue'
-import MainPage from '@/pages/MainPage/MainPage.vue'
-import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,12 +12,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'main',
-      component: MainPage,
+      component: () => import('@/pages/MainPage/MainPage.vue'),
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ProfilePage,
+      component: () => import('@/pages/ProfilePage/ProfilePage.vue'),
       meta: {
         requiresAuth: true,
       },
@@ -30,7 +25,7 @@ const router = createRouter({
     {
       path: '/favorites',
       name: 'favorites',
-      component: FavoritesPage,
+      component: () => import('@/pages/FavoritesPage/FavoritesPage.vue'),
       meta: {
         requiresAuth: true,
       },
@@ -38,7 +33,7 @@ const router = createRouter({
     {
       path: '/basket',
       name: 'basket',
-      component: BasketPage,
+      component: () => import('@/pages/BasketPage/BasketPage.vue'),
       meta: {
         requiresAuth: true,
       },
@@ -46,7 +41,7 @@ const router = createRouter({
     {
       path: '/library',
       name: 'library',
-      component: LibraryPage,
+      component: () => import('@/pages/LibraryPage/LibraryPage.vue'),
       meta: {
         requiresAuth: true,
       },

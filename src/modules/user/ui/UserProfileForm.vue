@@ -27,13 +27,12 @@
           :animate="{ opacity: 1, scale: 1 }"
           :transition="{ duration: 0.28, ease: 'easeOut', delay: 0.12 }"
         >
-          <img
-            v-if="displayAvatarUrl"
+          <UserAvatar
             :src="displayAvatarUrl"
             :alt="profileName"
-            class="h-full w-full object-cover"
+            :fallback="userInitials"
+            class="flex h-full w-full items-center justify-center"
           />
-          <span v-else>{{ userInitials }}</span>
           <span
             v-if="dirtyFields.avatar"
             class="absolute right-1 bottom-1 flex h-6 w-6 items-center justify-center rounded-full bg-(--color-primary) text-xs text-(--color-on-primary)"
@@ -181,6 +180,7 @@
 </template>
 
 <script setup lang="ts">
+import { UserAvatar } from '@/shared/ui'
 import { motion } from 'motion-v'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
