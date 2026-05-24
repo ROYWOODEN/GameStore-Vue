@@ -12,16 +12,20 @@
 
 <script setup lang="ts">
 import type { AuthSession, LoginPayload, RegisterPayload } from '@/modules/auth'
-import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useAuth, useAuthDialog, useAuthPrompt } from '@/modules/auth'
 import { AuthDialog } from '@/modules/auth'
 import { useUser } from '@/modules/user'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
+import { useToast } from 'primevue/usetoast'
 import { computed, watch } from 'vue'
 
-const { initialMode, closeAuthDialog, visible } = useAuthDialog()
+const { initialMode, closeAuthDialog, openAuthDialog, visible } = useAuthDialog()
 const { clearError, continueWithGoogle, authError, isLoading, login, register } = useAuth()
+const { promptId, promptMode, promptToastDetailKey, promptToastSummaryKey, shouldShowPromptToast } =
+  useAuthPrompt()
 const { setCurrentUser } = useUser()
 const { getMessage } = useI18nMessage()
+const toast = useToast()
 
 const resolvedErrorMessage = computed(() => {
   if (!authError.value) {
@@ -70,4 +74,27 @@ watch(visible, (isVisible) => {
     clearError()
   }
 })
+
+watch(
+  promptId,
+  (nextPromptId) => {
+    if (nextPromptId === 0) {
+      return
+    }
+
+    openAuthDialog(promptMode.value)
+
+    if (!shouldShowPromptToast.value) {
+      return
+    }
+
+    toast.add({
+      severity: 'warn',
+      summary: getMessage(promptToastSummaryKey.value),
+      detail: getMessage(promptToastDetailKey.value),
+      life: 3000,
+    })
+  },
+  { immediate: true },
+)
 </script>

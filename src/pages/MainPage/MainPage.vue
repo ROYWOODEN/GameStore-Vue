@@ -4,37 +4,16 @@
   >
     <PageLoader v-if="isLoading" />
     <section v-else-if="games.length > 0">
-      <div
-        class="grid auto-rows-fr grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),20rem))] justify-center gap-5"
-      >
-        <AnimatePresence>
-          <motion.div
-            v-for="game in games"
-            :key="game.id"
-            layout
-            :initial="{ opacity: 0, y: 28, scale: 0.96 }"
-            :while-in-view="{ opacity: 1, y: 0, scale: 1 }"
-            :viewport="{ once: false, amount: 0.25 }"
-            :while-hover="{ y: -8, scale: 1.015 }"
-            :while-tap="{ scale: 0.985 }"
-            :transition="{
-              opacity: { duration: 0.3, ease: 'easeOut' },
-              y: { duration: 0.28, ease: 'easeOut' },
-              scale: { duration: 0.18, ease: 'easeOut' },
-            }"
-          >
-            <GameCardItem
-              :game="game"
-              :is-favorite="favoriteIdSet.has(game.id)"
-              :is-favorite-pending="pendingFavoriteIdSet.has(game.id)"
-              :is-in-basket="basketIdSet.has(game.id)"
-              :is-basket-pending="pendingBasketIdSet.has(game.id)"
-              @basket-toggle="handleBasketToggle"
-              @favorite-toggle="handleFavoriteToggle"
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      <GameCardGrid
+        :games="games"
+        :favorite-ids="favoriteIds"
+        :pending-favorite-ids="pendingFavoriteIds"
+        :basket-ids="basketIds"
+        :pending-basket-ids="pendingBasketIds"
+        :owned-ids="libraryIds"
+        @basket-toggle="handleBasketToggle"
+        @favorite-toggle="handleFavoriteToggle"
+      />
     </section>
     <RetryState
       v-else-if="loadError"
@@ -59,14 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useAuth, useAuthPrompt } from '@/modules/auth'
 import { useBasket, type BasketGame } from '@/modules/basket'
 import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
-import { GameCardItem, useGames } from '@/modules/game'
+import { GameCardGrid, useGames } from '@/modules/game'
+import { useLibrary } from '@/modules/library'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
-import { AnimatePresence, motion } from 'motion-v'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -74,7 +53,7 @@ const { t } = useI18n()
 
 const { getGames, games, isLoading, loadError } = useGames()
 const { isAuthenticated, isSessionInitialized } = useAuth()
-const { openAuthDialog } = useAuthDialog()
+const { requestAuthPrompt } = useAuthPrompt()
 const { clearFavorites, favoriteIds, getFavoriteIds, pendingFavoriteIds, toggleFavorite } =
   useFavorites()
 const {
@@ -86,14 +65,13 @@ const {
   pendingBasketIds,
   toggleBasketItem,
 } = useBasket()
+const { clearLibraryState, getLibraryIds, libraryIds } = useLibrary()
 
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
 
 const favoriteIdSet = computed(() => new Set(favoriteIds.value))
-const pendingFavoriteIdSet = computed(() => new Set(pendingFavoriteIds.value))
 const basketIdSet = computed(() => new Set(basketIds.value))
-const pendingBasketIdSet = computed(() => new Set(pendingBasketIds.value))
 let userMarksLoaded = false
 
 const loadBasketIdsIfNeeded = async (): Promise<void> => {
@@ -113,6 +91,7 @@ const loadUserMarks = async (): Promise<void> => {
     userMarksLoaded = false
     clearFavorites()
     clearBasketState()
+    clearLibraryState()
     return
   }
 
@@ -120,7 +99,7 @@ const loadUserMarks = async (): Promise<void> => {
     return
   }
 
-  await Promise.all([getFavoriteIds(), loadBasketIdsIfNeeded()])
+  await Promise.all([getFavoriteIds(), loadBasketIdsIfNeeded(), getLibraryIds()])
   userMarksLoaded = true
 }
 
@@ -139,7 +118,7 @@ const handleRetry = (): void => {
 
 const handleFavoriteToggle = async (game: { id: FavoriteGameId }): Promise<void> => {
   if (!isAuthenticated.value) {
-    openAuthDialog('login')
+    requestAuthPrompt()
     return
   }
 
@@ -163,6 +142,7 @@ watch([isSessionInitialized, isAuthenticated], async ([sessionInitialized, authe
     userMarksLoaded = false
     clearFavorites()
     clearBasketState()
+    clearLibraryState()
     return
   }
 
@@ -175,7 +155,7 @@ watch([isSessionInitialized, isAuthenticated], async ([sessionInitialized, authe
 
 const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promise<void> => {
   if (!isAuthenticated.value) {
-    openAuthDialog('login')
+    requestAuthPrompt()
     return
   }
 

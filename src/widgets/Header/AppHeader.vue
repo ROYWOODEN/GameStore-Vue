@@ -79,7 +79,7 @@
           :class="cartButtonClass"
           type="button"
           :aria-label="t('header.cart')"
-          @click="openAuthDialog('login')"
+          @click="requestAuthPrompt()"
         >
           <VueIcon name="bs:basket-3-fill" />
         </button>
@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { setLocale, type AppLocale } from '@/app/i18n'
 import { useAppTheme } from '@/app/theme/useAppTheme'
-import { useAuth, useAuthDialog } from '@/modules/auth'
+import { useAuth, useAuthDialog, useAuthPrompt } from '@/modules/auth'
 import { useUser } from '@/modules/user'
 import { buildAssetUrl } from '@/shared/lib/url'
 import { getUserDisplayName, getUserInitials } from '@/shared/lib/user'
@@ -143,6 +143,7 @@ import { useI18n } from 'vue-i18n'
 const { locale, t } = useI18n()
 const { isDark, toggleTheme } = useAppTheme()
 const { openAuthDialog } = useAuthDialog()
+const { requestAuthPrompt } = useAuthPrompt()
 const { isAuthenticated } = useAuth()
 const { basketCount, cartLabel, displayBasketCount } = useBasketBadge()
 const { user } = useUser()

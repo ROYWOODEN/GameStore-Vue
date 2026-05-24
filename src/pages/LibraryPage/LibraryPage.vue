@@ -2,26 +2,23 @@
   <main
     class="min-h-[calc(100vh-5rem)] bg-(--color-background) px-6 pt-8 pb-12 min-[560px]:px-8 min-[1024px]:px-12 min-[1280px]:px-20"
   >
-    <PageLoader v-if="isFavoritesLoading" />
+    <PageLoader v-if="isLibraryLoading" />
 
-    <section v-else-if="favorites.length > 0">
+    <section v-else-if="libraryItems.length > 0">
       <GameCardGrid
-        :games="favorites"
+        :games="libraryItems"
         :favorite-ids="favoriteIds"
         :pending-favorite-ids="pendingFavoriteIds"
-        :basket-ids="basketIds"
-        :pending-basket-ids="pendingBasketIds"
-        :owned-ids="libraryIds"
-        @basket-toggle="handleBasketToggle"
+        force-owned
         @favorite-toggle="handleFavoriteToggle"
       />
     </section>
 
     <RetryState
-      v-else-if="favoritesLoadError"
-      :title="t('favoritesPage.loadErrorTitle')"
-      :message="getMessage(favoritesLoadError.message)"
-      :action-label="t('favoritesPage.retry')"
+      v-else-if="libraryLoadError"
+      :title="t('libraryPage.loadErrorTitle')"
+      :message="getMessage(libraryLoadError.message)"
+      :action-label="t('libraryPage.retry')"
       @retry="handleRetry"
     />
 
@@ -33,13 +30,13 @@
           class="mb-1 flex h-16 w-16 items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-3xl text-(--color-primary)"
           aria-hidden="true"
         >
-          <VueIcon name="bs:heart" />
+          <VueIcon name="co:library" />
         </div>
         <h1 class="text-2xl font-bold text-(--color-on-surface)">
-          {{ t('favoritesPage.emptyTitle') }}
+          {{ t('libraryPage.emptyTitle') }}
         </h1>
         <p class="text-sm leading-6 text-(--color-on-surface-variant)">
-          {{ t('favoritesPage.emptyDescription') }}
+          {{ t('libraryPage.emptyDescription') }}
         </p>
       </div>
     </section>
@@ -47,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import { useBasket, type BasketGame } from '@/modules/basket'
 import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
 import { GameCardGrid } from '@/modules/game'
 import { useLibrary } from '@/modules/library'
@@ -60,64 +56,32 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const { showApiError } = useApiErrorToast()
 const { getMessage } = useI18nMessage()
-const {
-  favoriteIds,
-  favorites,
-  favoritesLoadError,
-  getFavorites,
-  isFavoritesLoading,
-  pendingFavoriteIds,
-  removeFavorite,
-} = useFavorites()
-const {
-  basketIds,
-  getBasketIds,
-  hasBasketIdsLoaded,
-  isBasketIdsLoading,
-  pendingBasketIds,
-  toggleBasketItem,
-} = useBasket()
-const { getLibraryIds, libraryIds } = useLibrary()
+const { favoriteIds, getFavoriteIds, pendingFavoriteIds, toggleFavorite } = useFavorites()
+const { getLibrary, isLibraryLoading, libraryItems, libraryLoadError } = useLibrary()
 
-const basketIdSet = computed(() => new Set(basketIds.value))
+const favoriteIdSet = computed(() => new Set(favoriteIds.value))
 
-const loadBasketIdsIfNeeded = async (): Promise<void> => {
-  if (hasBasketIdsLoaded.value || isBasketIdsLoading.value) {
-    return
-  }
-
-  await getBasketIds()
-}
-
-const loadFavoritesPage = async (): Promise<void> => {
+const loadLibraryPage = async (): Promise<void> => {
   try {
-    await Promise.all([getFavorites(), loadBasketIdsIfNeeded(), getLibraryIds()])
+    await Promise.all([getLibrary(), getFavoriteIds()])
   } catch (error: unknown) {
     showApiError(error)
   }
 }
 
 const handleRetry = (): void => {
-  loadFavoritesPage()
+  loadLibraryPage()
 }
 
 const handleFavoriteToggle = async (game: { id: FavoriteGameId }): Promise<void> => {
   try {
-    await removeFavorite(game.id)
-  } catch (error: unknown) {
-    showApiError(error)
-  }
-}
-
-const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promise<void> => {
-  try {
-    await toggleBasketItem(game, basketIdSet.value.has(game.id))
+    await toggleFavorite(game.id, favoriteIdSet.value.has(game.id))
   } catch (error: unknown) {
     showApiError(error)
   }
 }
 
 onMounted(() => {
-  loadFavoritesPage()
+  loadLibraryPage()
 })
 </script>

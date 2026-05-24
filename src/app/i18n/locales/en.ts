@@ -13,6 +13,7 @@ export const en = {
     removeFromFavorites: 'Remove from favorites',
     coverPlaceholder: 'Game cover is missing',
     platforms: 'Platforms',
+    play: 'Play',
   },
   mainPage: {
     emptyDescription: 'Try again later: the catalog will appear soon.',
@@ -24,6 +25,12 @@ export const en = {
     emptyDescription: 'Saved games will be waiting here.',
     emptyTitle: 'No favorites yet',
     loadErrorTitle: 'Failed to load favorites',
+    retry: 'Retry',
+  },
+  libraryPage: {
+    emptyDescription: 'Purchased games will appear here after payment.',
+    emptyTitle: 'Your library is empty',
+    loadErrorTitle: 'Failed to load library',
     retry: 'Retry',
   },
   basketPage: {
@@ -166,6 +173,10 @@ export const en = {
       passwordUppercase: 'Password must contain at least one uppercase Latin letter',
       required: 'This field is required',
     },
+  },
+  authPrompt: {
+    loginRequiredDescription: 'Log in to open this section.',
+    loginRequiredTitle: 'Log in first',
   },
   header: {
     cart: 'Cart',
