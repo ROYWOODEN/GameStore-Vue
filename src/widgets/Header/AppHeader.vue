@@ -95,17 +95,12 @@
           class="group/profile flex h-12 max-w-70 min-w-0 items-center gap-3 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) py-1.5 pr-3 pl-1.5 text-left text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
           :aria-label="profileLabel"
         >
-          <span
+          <UserAvatar
+            :src="avatarUrl"
+            :alt="profileLabel"
+            :fallback="userInitials"
             class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-(--color-outline-variant) bg-(--color-menu-active-bg) text-sm font-bold text-(--color-primary)"
-          >
-            <img
-              v-if="avatarUrl"
-              :src="avatarUrl"
-              :alt="profileLabel"
-              class="h-full w-full object-cover"
-            />
-            <span v-else>{{ userInitials }}</span>
-          </span>
+          />
 
           <span class="hidden min-w-0 flex-col leading-tight min-[1180px]:flex">
             <span class="truncate text-sm font-semibold">{{ profileName }}</span>
@@ -130,6 +125,7 @@ import { useAuth, useAuthDialog, useAuthPrompt } from '@/modules/auth'
 import { useUser } from '@/modules/user'
 import { buildAssetUrl } from '@/shared/lib/url'
 import { getUserDisplayName, getUserInitials } from '@/shared/lib/user'
+import { UserAvatar } from '@/shared/ui'
 import { useBasketBadge } from '@/widgets/Header/composables/useBasketBadge'
 import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
