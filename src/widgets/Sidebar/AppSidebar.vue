@@ -56,6 +56,7 @@
 import { useAuth } from '@/modules/auth'
 import { useBasket } from '@/modules/basket'
 import { useFavorites } from '@/modules/favorite'
+import { useLibrary } from '@/modules/library'
 import { useCheckoutPayment } from '@/modules/payment'
 import { SettingsDialog } from '@/modules/setting'
 import { useUser } from '@/modules/user'
@@ -73,6 +74,7 @@ const { t } = useI18n()
 const { logout } = useAuth()
 const { clearFavorites } = useFavorites()
 const { clearBasketState } = useBasket()
+const { clearLibraryState } = useLibrary()
 const { clearPaymentState } = useCheckoutPayment()
 const settingsVisible = ref<boolean>(false)
 
@@ -127,6 +129,7 @@ const handleLogout = async (): Promise<void> => {
     clearCurrentUser()
     clearFavorites()
     clearBasketState()
+    clearLibraryState()
     clearPaymentState()
   } catch (error: unknown) {
     showApiError(error)

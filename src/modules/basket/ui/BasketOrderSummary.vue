@@ -41,7 +41,11 @@
       <button
         :class="[
           'flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-(--color-primary) bg-(--color-primary) px-4 text-sm font-bold text-(--color-on-primary) transition-colors hover:border-(--color-primary-strong) hover:bg-(--color-primary-strong) disabled:opacity-75',
-          isCheckoutLoading ? 'cursor-wait' : count === 0 || isClearing ? 'cursor-not-allowed' : 'cursor-pointer',
+          isCheckoutLoading
+            ? 'cursor-wait'
+            : count === 0 || isClearing
+              ? 'cursor-not-allowed'
+              : 'cursor-pointer',
         ]"
         type="button"
         :disabled="isClearing || isCheckoutLoading || count === 0"
@@ -66,7 +70,11 @@
       <button
         :class="[
           'flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-[color-mix(in_srgb,var(--color-error)_62%,transparent)] bg-[color-mix(in_srgb,var(--color-error)_12%,var(--color-surface-container-high))] px-4 text-sm font-bold text-(--color-error) transition-colors hover:border-(--color-error) hover:bg-[color-mix(in_srgb,var(--color-error)_18%,var(--color-surface-container-high))] disabled:opacity-75',
-          isClearing ? 'cursor-wait' : isCheckoutLoading || totalCount === 0 ? 'cursor-not-allowed' : 'cursor-pointer',
+          isClearing
+            ? 'cursor-wait'
+            : isCheckoutLoading || totalCount === 0
+              ? 'cursor-not-allowed'
+              : 'cursor-pointer',
         ]"
         type="button"
         :disabled="isClearing || isCheckoutLoading || totalCount === 0"

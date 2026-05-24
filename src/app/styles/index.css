@@ -98,6 +98,10 @@ body {
   animation: none;
 }
 
+.p-toast {
+  z-index: 2200 !important;
+}
+
 .profile-confirm-cancel-button {
   border-color: var(--color-outline-variant) !important;
   background: transparent !important;

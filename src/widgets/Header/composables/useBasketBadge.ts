@@ -9,13 +9,8 @@ export const useBasketBadge = () => {
   const route = useRoute()
   const { t } = useI18n()
   const { isAuthenticated, isSessionInitialized } = useAuth()
-  const {
-    basketCount,
-    clearBasketState,
-    getBasketIds,
-    hasBasketIdsLoaded,
-    isBasketIdsLoading,
-  } = useBasket()
+  const { basketCount, clearBasketState, getBasketIds, hasBasketIdsLoaded, isBasketIdsLoading } =
+    useBasket()
   const { showApiError } = useApiErrorToast()
 
   const displayBasketCount = computed(() =>
@@ -28,11 +23,7 @@ export const useBasketBadge = () => {
   )
 
   const loadBasketIdsIfNeeded = async (): Promise<void> => {
-    if (
-      route.name === 'basket' ||
-      hasBasketIdsLoaded.value ||
-      isBasketIdsLoading.value
-    ) {
+    if (route.name === 'basket' || hasBasketIdsLoaded.value || isBasketIdsLoading.value) {
       return
     }
 

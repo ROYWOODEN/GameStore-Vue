@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { useAuthStore } from '@/modules/auth'
+import { useAuthPromptStore, useAuthStore } from '@/modules/auth'
 import { useUserStore } from '@/modules/user'
 import BasketPage from '@/pages/BasketPage/BasketPage.vue'
 import FavoritesPage from '@/pages/FavoritesPage/FavoritesPage.vue'
+import LibraryPage from '@/pages/LibraryPage/LibraryPage.vue'
 import MainPage from '@/pages/MainPage/MainPage.vue'
 import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue'
 
@@ -42,6 +43,14 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: '/library',
+      name: 'library',
+      component: LibraryPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
   ],
 })
 
@@ -51,6 +60,7 @@ router.beforeEach(async (to) => {
   }
 
   const authStore = useAuthStore()
+  const authPromptStore = useAuthPromptStore()
   const userStore = useUserStore()
   if (authStore.isAuthenticated) {
     return true
@@ -61,6 +71,7 @@ router.beforeEach(async (to) => {
     if (!hasSession) {
       userStore.clearCurrentUser()
       authStore.markSessionInitialized()
+      authPromptStore.requestAuthPrompt()
       return { name: 'main' }
     }
 
@@ -68,6 +79,7 @@ router.beforeEach(async (to) => {
   } catch {
     userStore.clearCurrentUser()
     authStore.markSessionInitialized()
+    authPromptStore.requestAuthPrompt()
     return { name: 'main' }
   }
 })

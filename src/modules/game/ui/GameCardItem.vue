@@ -140,6 +140,17 @@
         </div>
 
         <Button
+          v-if="isOwned"
+          class="min-w-28 justify-center! gap-1.5! rounded-lg! border-(--color-primary)! bg-(--color-primary)! px-3! py-2.5! text-[0.875rem]! font-semibold! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!"
+          type="button"
+          :aria-label="t('game.play')"
+        >
+          <VueIcon name="bs:play-fill" class="text-[1.25rem] min-[560px]:text-[1.45rem]" />
+          <span>{{ t('game.play') }}</span>
+        </Button>
+
+        <Button
+          v-else
           :class="[
             'min-w-28 justify-center! gap-1.5! rounded-lg! px-3! py-2.5! text-[0.875rem]! font-semibold! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!',
             isInBasket
@@ -194,12 +205,14 @@ const props = withDefaults(
     isFavoritePending?: boolean
     isInBasket?: boolean
     isBasketPending?: boolean
+    isOwned?: boolean
   }>(),
   {
     isBasketPending: false,
     isFavorite: false,
     isFavoritePending: false,
     isInBasket: false,
+    isOwned: false,
   },
 )
 

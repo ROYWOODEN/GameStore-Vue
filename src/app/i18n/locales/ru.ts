@@ -11,6 +11,7 @@ export const ru = {
     removeFromFavorites: 'Удалить из избранного',
     coverPlaceholder: 'Обложка игры отсутствует',
     platforms: 'Платформы',
+    play: 'Играть',
   },
   mainPage: {
     emptyDescription: 'Попробуйте зайти позже: каталог скоро появится.',
@@ -22,6 +23,12 @@ export const ru = {
     emptyDescription: 'Сохраненные игры будут ждать вас здесь.',
     emptyTitle: 'В избранном пока пусто',
     loadErrorTitle: 'Не удалось загрузить избранное',
+    retry: 'Повторить',
+  },
+  libraryPage: {
+    emptyDescription: 'Купленные игры появятся здесь после оплаты.',
+    emptyTitle: 'В библиотеке пока пусто',
+    loadErrorTitle: 'Не удалось загрузить библиотеку',
     retry: 'Повторить',
   },
   basketPage: {
@@ -164,6 +171,10 @@ export const ru = {
       passwordUppercase: 'Пароль должен содержать хотя бы одну заглавную латинскую букву',
       required: 'Поле обязательно',
     },
+  },
+  authPrompt: {
+    loginRequiredDescription: 'Войдите в аккаунт, чтобы открыть этот раздел.',
+    loginRequiredTitle: 'Сначала авторизуйтесь',
   },
   header: {
     cart: 'Корзина',
