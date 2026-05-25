@@ -87,12 +87,22 @@
 
     <template #title>
       <div
-        class="grid min-h-14 grid-cols-1 items-start gap-2.5 min-[560px]:min-h-16 min-[560px]:gap-3 min-[1280px]:min-h-18"
+        class="grid min-h-18 grid-cols-1 items-start gap-2 min-[560px]:min-h-20 min-[560px]:gap-2.5 min-[1280px]:min-h-22"
       >
         <span
           class="line-clamp-2 text-[1.45rem] leading-[1.15] font-extrabold text-(--color-on-surface) min-[560px]:text-[1.65rem] min-[1280px]:text-[1.85rem]"
         >
           {{ game.title }}
+        </span>
+        <span
+          class="flex h-5 items-center gap-1.5 text-xs font-bold text-(--color-on-surface-variant)"
+          :aria-label="ratingAriaLabel"
+        >
+          <VueIcon
+            :name="hasRating ? 'bs:star-fill' : 'bs:star'"
+            :class="hasRating ? 'text-(--color-primary)' : 'text-(--color-on-surface-variant)'"
+          />
+          <span>{{ ratingLabel }}</span>
         </span>
       </div>
     </template>
@@ -144,6 +154,7 @@
           class="min-w-28 justify-center! gap-1.5! rounded-lg! border-(--color-primary)! bg-(--color-primary)! px-3! py-2.5! text-[0.875rem]! font-semibold! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!"
           type="button"
           :aria-label="t('game.play')"
+          @click.stop
         >
           <VueIcon name="bs:play-fill" class="text-[1.25rem] min-[560px]:text-[1.45rem]" />
           <span>{{ t('game.play') }}</span>
@@ -196,7 +207,8 @@ import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { GameListItem, GameTag, GameTagType } from '../types/game'
+import { formatGameRating } from '../lib/rating'
+import type { GameListItem, GameListTag, GameListTagType } from '../types/game'
 
 const props = withDefaults(
   defineProps<{
@@ -224,19 +236,42 @@ const emit = defineEmits<{
 const apiUrl = import.meta.env.VITE_API_URL
 const { t } = useI18n()
 
-const cardTagTypes: GameTagType[] = ['genre', 'mode', 'theme']
+const cardTagTypes: GameListTagType[] = ['genre', 'mode', 'theme']
 
 const cardTags = computed(() =>
-  props.game.tags.filter((tag) => cardTagTypes.includes(tag.type)).slice(0, 3),
+  props.game.tags.filter((tag) => cardTagTypes.includes(getTagTypeName(tag))).slice(0, 3),
 )
 
-const coverImage = computed(() => props.game.media.images[0])
+const coverImage = computed(
+  () =>
+    [...props.game.media.images].sort(
+      (first, second) => (first.sort_order ?? 0) - (second.sort_order ?? 0),
+    )[0],
+)
 const coverImageUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverImageAlt = computed(() => coverImage.value?.alt || props.game.title)
 const formattedPrice = computed(() => formatRubPrice(props.game.price))
+const ratingAverage = computed(() => props.game.rating?.average ?? null)
+const ratingCount = computed(() => props.game.rating?.count ?? 0)
+const hasRating = computed(() => ratingAverage.value !== null && ratingCount.value > 0)
+const formattedRatingAverage = computed(() =>
+  hasRating.value && ratingAverage.value !== null ? formatGameRating(ratingAverage.value) : '',
+)
+const ratingLabel = computed(() =>
+  hasRating.value
+    ? `${formattedRatingAverage.value} (${ratingCount.value})`
+    : t('game.rating.empty'),
+)
+const ratingAriaLabel = computed(() =>
+  hasRating.value
+    ? t('game.rating.label', { average: formattedRatingAverage.value, count: ratingCount.value })
+    : t('game.rating.empty'),
+)
 
-const ageTag = computed(() => props.game.tags.find((tag) => tag.type === 'age'))
-const platformTags = computed(() => props.game.tags.filter((tag) => tag.type === 'platforma'))
+const ageTag = computed(() => props.game.tags.find((tag) => getTagTypeName(tag) === 'age'))
+const platformTags = computed(() =>
+  props.game.tags.filter((tag) => getTagTypeName(tag) === 'platforma'),
+)
 const favoriteIconName = computed(() => (props.isFavorite ? 'bs:heart-fill' : 'bs:heart'))
 const favoriteIconKey = computed(() =>
   props.isFavoritePending ? 'favorite-pending' : favoriteIconName.value,
@@ -268,5 +303,9 @@ const platformIcons: Record<string, string> = {
   macos: 'bs:apple',
 }
 
-const getPlatformIcon = (platform: GameTag): string => platformIcons[platform.name] ?? 'bs:display'
+const getPlatformIcon = (platform: GameListTag): string =>
+  platformIcons[platform.name.toLowerCase()] ?? 'bs:display'
+
+const getTagTypeName = (tag: GameListTag): GameListTagType =>
+  typeof tag.type === 'string' ? tag.type : (tag.type.name as GameListTagType)
 </script>

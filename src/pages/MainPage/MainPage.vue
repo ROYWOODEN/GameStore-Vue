@@ -13,6 +13,7 @@
         :owned-ids="libraryIds"
         @basket-toggle="handleBasketToggle"
         @favorite-toggle="handleFavoriteToggle"
+        @game-select="openGame"
       />
     </section>
     <RetryState
@@ -48,8 +49,14 @@ import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void | Promise<void>) => void
+}
 
 const { t } = useI18n()
+const router = useRouter()
 
 const { getGames, games, isLoading, loadError } = useGames()
 const { isAuthenticated, isSessionInitialized } = useAuth()
@@ -164,5 +171,17 @@ const handleBasketToggle = async (game: Pick<BasketGame, 'id' | 'price'>): Promi
   } catch (error: unknown) {
     showApiError(error)
   }
+}
+
+const openGame = (id: string): void => {
+  const navigate = () => router.push({ name: 'game-details', params: { id } })
+  const transitionDocument = document as ViewTransitionDocument
+
+  if (transitionDocument.startViewTransition) {
+    transitionDocument.startViewTransition(navigate)
+    return
+  }
+
+  navigate()
 }
 </script>

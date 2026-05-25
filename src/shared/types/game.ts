@@ -3,8 +3,14 @@ export interface GameListItem {
   title: string
   description: string
   price: string
+  rating?: GameRating
   tags: GameTag[]
   media: GameMedia
+}
+
+export interface GameRating {
+  average: number | null
+  count: number
 }
 
 export interface GameTag {
