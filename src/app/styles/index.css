@@ -102,6 +102,28 @@ body {
   z-index: 2200 !important;
 }
 
+.p-select {
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-select-dropdown {
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+.p-select-dropdown svg,
+.p-select-dropdown-icon {
+  color: currentColor !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+.p-select:not(.p-disabled):hover .p-select-dropdown,
+.p-select.p-focus .p-select-dropdown {
+  color: var(--color-primary) !important;
+}
+
 .profile-confirm-cancel-button {
   border-color: var(--color-outline-variant) !important;
   background: transparent !important;

@@ -25,5 +25,11 @@ export interface ApiError<TDetails = null> {
 }
 export interface ApiMeta {
   count: number
+  hasNextPage?: boolean
+  hasPreviousPage?: boolean
+  limit?: number
+  page?: number
+  total?: number
   totalAmount?: string
+  totalPages?: number
 }

@@ -31,7 +31,7 @@
 import { motion } from 'motion-v'
 import { useI18n } from 'vue-i18n'
 
-const props = defineProps<{
+defineProps<{
   isDeleting: boolean
 }>()
 
