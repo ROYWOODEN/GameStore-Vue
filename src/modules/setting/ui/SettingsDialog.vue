@@ -32,7 +32,8 @@
                 : 'text-(--color-on-surface-variant)',
             ]"
           >
-            <i :class="section.icon" />
+            <VueIcon v-if="section.isVueIcon" :name="section.icon" />
+            <i v-else :class="section.icon" />
           </span>
           <span class="truncate">{{ t(section.titleKey) }}</span>
         </button>
@@ -122,13 +123,27 @@
               {{ t('settings.admin.title') }}
             </h3>
 
-            <div
-              class="rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) p-4"
+            <button
+              class="group flex w-full cursor-pointer items-center gap-4 rounded-md border border-(--color-primary) bg-(--color-surface-container-high) p-4 text-left text-(--color-on-surface) transition-colors hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)"
+              type="button"
+              @click="openAdminPanel"
             >
-              <p class="font-semibold text-(--color-on-surface)">
-                {{ t('settings.admin.panel') }}
-              </p>
-            </div>
+              <span
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-(--color-primary) bg-(--color-surface-container) text-2xl text-(--color-primary)"
+              >
+                <VueIcon name="md:sharp-admin-panel-settings" />
+              </span>
+              <span class="min-w-0">
+                <span class="block font-semibold">{{ t('settings.admin.panel') }}</span>
+                <span class="mt-1 block text-sm text-(--color-on-surface-variant)">
+                  {{ t('settings.admin.description') }}
+                </span>
+              </span>
+              <VueIcon
+                name="bs:arrow-right"
+                class="ml-auto shrink-0 transition-transform group-hover:translate-x-1"
+              />
+            </button>
           </div>
         </motion.div>
       </section>
@@ -143,12 +158,18 @@ import { motion } from 'motion-v'
 import Dialog from 'primevue/dialog'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void | Promise<void>) => void
+}
 
 type SettingsSection = 'theme' | 'language' | 'security' | 'admin'
 
 type SettingsTab = {
   id: SettingsSection
   icon: string
+  isVueIcon?: boolean
   titleKey: string
 }
 
@@ -174,6 +195,7 @@ const props = withDefaults(
 )
 const { locale, t } = useI18n()
 const { setTheme, theme } = useAppTheme()
+const router = useRouter()
 
 const activeSection = ref<SettingsSection>('theme')
 
@@ -182,7 +204,14 @@ const settingsSections = computed<SettingsTab[]>(() => [
   { id: 'language', icon: 'pi pi-language', titleKey: 'settings.tabs.language' },
   { id: 'security', icon: 'pi pi-shield', titleKey: 'settings.tabs.security' },
   ...(props.canViewAdmin
-    ? ([{ id: 'admin', icon: 'pi pi-server', titleKey: 'settings.tabs.admin' }] as const)
+    ? ([
+        {
+          id: 'admin',
+          icon: 'md:sharp-admin-panel-settings',
+          isVueIcon: true,
+          titleKey: 'settings.tabs.admin',
+        },
+      ] as const)
     : []),
 ])
 
@@ -227,6 +256,20 @@ const dialogPassThrough = {
 
 const setActiveSection = (section: SettingsSection): void => {
   activeSection.value = section
+}
+
+const openAdminPanel = (): void => {
+  visible.value = false
+
+  const navigate = () => router.push('/admin/games')
+  const transitionDocument = document as ViewTransitionDocument
+
+  if (transitionDocument.startViewTransition) {
+    transitionDocument.startViewTransition(navigate)
+    return
+  }
+
+  navigate()
 }
 
 watch(

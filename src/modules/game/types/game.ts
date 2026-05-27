@@ -3,6 +3,8 @@ export interface GameListItem {
   title: string
   description: string
   price: string
+  created_at?: string
+  updated_at?: string
   rating?: GameRating
   tags: GameListTag[]
   media: GameMedia

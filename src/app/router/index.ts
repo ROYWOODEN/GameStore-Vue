@@ -17,6 +17,10 @@ const router = createRouter({
       component: () => import('@/pages/MainPage/MainPage.vue'),
     },
     {
+      path: '/catalog',
+      redirect: { name: 'main' },
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/ProfilePage/ProfilePage.vue'),
@@ -53,36 +57,81 @@ const router = createRouter({
       name: 'game-details',
       component: () => import('@/pages/GameDetailPage/GameDetailPage.vue'),
     },
+    {
+      path: '/admin',
+      component: () => import('@/pages/AdminPage/AdminPage.vue'),
+      meta: {
+        requiresAdmin: true,
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: '',
+          redirect: { name: 'admin-games' },
+        },
+        {
+          path: 'games',
+          name: 'admin-games',
+          component: () => import('@/pages/AdminPage/AdminGamesPage.vue'),
+        },
+        {
+          path: 'games/new',
+          name: 'admin-game-create',
+          component: () => import('@/pages/AdminPage/AdminGameCreatePage.vue'),
+        },
+        {
+          path: 'tags',
+          name: 'admin-tags',
+          component: () => import('@/pages/AdminPage/AdminTagsPage.vue'),
+        },
+      ],
+    },
   ],
 })
 
 router.beforeEach(async (to) => {
-  if (!to.meta.requiresAuth) {
+  const requiresAuth = Boolean(to.meta.requiresAuth || to.meta.requiresAdmin)
+
+  if (!requiresAuth) {
     return true
   }
 
   const authStore = useAuthStore()
   const authPromptStore = useAuthPromptStore()
   const userStore = useUserStore()
-  if (authStore.isAuthenticated) {
-    return true
-  }
 
-  try {
-    const hasSession = await authStore.refreshSession()
-    if (!hasSession) {
-      userStore.clearCurrentUser()
-      authStore.markSessionInitialized()
-      authPromptStore.requestAuthPrompt()
-      return { name: 'main' }
-    }
-
-    return true
-  } catch {
+  const requestLogin = () => {
     userStore.clearCurrentUser()
     authStore.markSessionInitialized()
     authPromptStore.requestAuthPrompt()
     return { name: 'main' }
+  }
+
+  if (!authStore.isAuthenticated) {
+    try {
+      const hasSession = await authStore.refreshSession()
+      if (!hasSession) {
+        return requestLogin()
+      }
+    } catch {
+      return requestLogin()
+    }
+  }
+
+  if (!to.meta.requiresAdmin) {
+    return true
+  }
+
+  try {
+    const currentUser = userStore.user ?? (await userStore.loadCurrentUser())
+
+    if (currentUser.role !== 'admin') {
+      return { name: 'profile' }
+    }
+
+    return true
+  } catch {
+    return requestLogin()
   }
 })
 
