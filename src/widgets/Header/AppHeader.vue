@@ -5,25 +5,7 @@
     <div class="flex items-center gap-6">
       <div class="min-w-40"></div>
 
-      <div class="group w-[clamp(260px,34vw,460px)] shrink-0">
-        <FloatLabel variant="on">
-          <IconField>
-            <InputIcon
-              :class="[
-                searchLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search',
-                'text-lg! leading-none! text-(--color-search-icon)! transition-colors group-focus-within:text-(--color-primary)!',
-              ]"
-            />
-            <InputText id="on_label" v-model="search" class="w-full rounded-[1.25rem]! border-2!" />
-          </IconField>
-          <label
-            class="ml-0 max-w-[calc(100%-3rem)] truncate text-sm! font-normal! text-(--color-search-icon)! transition-colors group-focus-within:text-(--color-primary)!"
-            for="on_label"
-          >
-            {{ t('header.searchLabel') }}
-          </label>
-        </FloatLabel>
-      </div>
+      <HeaderGameSearch />
 
       <div class="ml-auto flex items-center gap-5">
         <button
@@ -122,6 +104,7 @@
 import { setLocale, type AppLocale } from '@/app/i18n'
 import { useAppTheme } from '@/app/theme/useAppTheme'
 import { useAuth, useAuthDialog, useAuthPrompt } from '@/modules/auth'
+import { HeaderGameSearch } from '@/modules/game'
 import { useUser } from '@/modules/user'
 import { buildAssetUrl } from '@/shared/lib/url'
 import { getUserDisplayName, getUserInitials } from '@/shared/lib/user'
@@ -129,11 +112,7 @@ import { UserAvatar } from '@/shared/ui'
 import { useBasketBadge } from '@/widgets/Header/composables/useBasketBadge'
 import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
-import FloatLabel from 'primevue/floatlabel'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { locale, t } = useI18n()
@@ -144,10 +123,6 @@ const { isAuthenticated } = useAuth()
 const { basketCount, cartLabel, displayBasketCount } = useBasketBadge()
 const { user } = useUser()
 
-const search = ref('')
-const searchLoading = ref(false)
-let searchTimer: ReturnType<typeof setTimeout> | undefined
-
 const avatarUrl = computed(() =>
   buildAssetUrl(user.value?.avatar_url, import.meta.env.VITE_API_URL),
 )
@@ -156,22 +131,6 @@ const profileLabel = computed(() => t('profile.openProfile', { name: profileName
 const userInitials = computed(() => getUserInitials(user.value))
 const cartButtonClass =
   'relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--color-outline-variant) bg-(--color-surface-container-high) text-xl text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:bg-(--color-surface-container-highest) hover:text-(--color-primary)'
-
-watch(search, (value) => {
-  if (searchTimer) {
-    clearTimeout(searchTimer)
-  }
-
-  if (!value.trim()) {
-    searchLoading.value = false
-    return
-  }
-
-  searchLoading.value = true
-  searchTimer = setTimeout(() => {
-    searchLoading.value = false
-  }, 700)
-})
 
 const toggleLocale = () => {
   setLocale((locale.value === 'ru' ? 'en' : 'ru') as AppLocale)

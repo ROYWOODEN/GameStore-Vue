@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatRubPrice } from '@/shared/lib/price'
+import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
 import { AnimatePresence, motion } from 'motion-v'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -48,5 +48,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const formattedPrice = computed(() => formatRubPrice(props.game.price))
+const isFree = computed(() => isFreePrice(props.game.price))
+const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
 </script>

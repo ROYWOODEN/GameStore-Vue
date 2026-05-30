@@ -51,11 +51,6 @@ export const useGameReviews = () => {
       myReview.value = await fetchMyGameReview(gameId)
     } catch (error: unknown) {
       const apiError = toApiError(error)
-      if (apiError.statusCode === 404) {
-        myReview.value = null
-        return
-      }
-
       myReviewLoadError.value = apiError
       throw apiError
     } finally {

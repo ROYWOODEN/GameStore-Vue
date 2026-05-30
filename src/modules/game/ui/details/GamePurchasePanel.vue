@@ -9,7 +9,16 @@
       <span class="text-sm font-semibold text-(--color-on-surface-variant)">
         {{ t('gameDetails.price') }}
       </span>
-      <span class="text-4xl font-black">{{ formattedPrice }}</span>
+      <span
+        v-if="isOwned"
+        class="inline-flex w-fit items-center gap-2 rounded-md border border-(--color-primary) bg-(--color-primary)/12 px-3 py-2 text-base font-extrabold text-(--color-primary)"
+      >
+        <VueIcon name="bs:check-circle-fill" />
+        <span>{{ t('game.owned') }}</span>
+      </span>
+      <span v-else class="text-4xl font-black" :class="isFree ? 'text-(--color-primary)' : ''">
+        {{ formattedPrice }}
+      </span>
     </div>
 
     <div class="grid gap-3">
@@ -100,7 +109,7 @@
 import type { GameListTag } from '@/modules/game'
 import { formatGameRating } from '@/modules/game/lib/rating'
 import { getTagGroupLabel, getTagTypeName } from '@/modules/game/lib/tags'
-import { formatRubPrice } from '@/shared/lib/price'
+import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
 import { motion } from 'motion-v'
 import Button from 'primevue/button'
 import Rating from 'primevue/rating'
@@ -126,7 +135,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const formattedPrice = computed(() => formatRubPrice(props.price))
+const isFree = computed(() => isFreePrice(props.price))
+const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.price)))
 const hasRating = computed(() => props.rating !== null && props.ratingCount > 0)
 const ratingValue = computed(() => Math.min(5, Math.max(0, props.rating ?? 0)))
 const ratingScoreLabel = computed(() =>
