@@ -110,7 +110,7 @@
 <script setup lang="ts">
 import type { AdminGameListItem } from '../types/admin'
 import { buildAssetUrl } from '@/shared/lib/url'
-import { formatRubPrice } from '@/shared/lib/price'
+import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
 import { useDateFormat } from '@vueuse/core'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -142,7 +142,8 @@ const coverImage = computed(
 )
 const coverUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverAlt = computed(() => coverImage.value?.alt || props.game.title)
-const formattedPrice = computed(() => formatRubPrice(props.game.price))
+const isFree = computed(() => isFreePrice(props.game.price))
+const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
 const platformTags = computed(() =>
   props.game.tags.filter((tag) => getTagTypeName(tag) === 'platform'),
 )

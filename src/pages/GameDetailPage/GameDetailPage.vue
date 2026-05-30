@@ -131,7 +131,7 @@ import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
 import { motion } from 'motion-v'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -174,8 +174,16 @@ const selectedMediaId = ref<string | null>(null)
 const isMediaDialogVisible = ref(false)
 const apiUrl = import.meta.env.VITE_API_URL
 let userMarksLoaded = false
+let isPageActive = true
 
-const routeGameId = computed(() => String(route.params.id))
+const routeGameId = computed(() => {
+  if (route.name !== 'game-details') {
+    return null
+  }
+
+  const id = route.params.id
+  return typeof id === 'string' ? id : null
+})
 const mediaItems = computed<GameDetailMediaItem[]>(() =>
   game.value ? buildMediaItems(game.value, apiUrl) : [],
 )
@@ -232,15 +240,29 @@ const selectMedia = (id: string): void => {
   isMediaDialogVisible.value = true
 }
 
-const loadGame = async (): Promise<void> => {
-  try {
-    await getGame(routeGameId.value)
-  } catch (error: unknown) {
+const showPageApiError = (error: unknown): void => {
+  if (isPageActive) {
     showApiError(error)
   }
 }
 
+const loadGame = async (): Promise<void> => {
+  if (!routeGameId.value) {
+    return
+  }
+
+  try {
+    await getGame(routeGameId.value)
+  } catch (error: unknown) {
+    showPageApiError(error)
+  }
+}
+
 const loadGameReviews = async (): Promise<void> => {
+  if (!routeGameId.value) {
+    return
+  }
+
   try {
     await getGameReviews(routeGameId.value)
 
@@ -250,7 +272,7 @@ const loadGameReviews = async (): Promise<void> => {
       clearMyReview()
     }
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
@@ -295,7 +317,7 @@ const loadUserMarksSafely = async (): Promise<void> => {
   try {
     await loadUserMarks()
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
@@ -316,7 +338,7 @@ const handleFavoriteToggle = async (): Promise<void> => {
   try {
     await toggleFavorite(game.value.id as FavoriteGameId, isCurrentGameFavorite.value)
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
@@ -336,11 +358,15 @@ const handleBasketToggle = async (): Promise<void> => {
       isCurrentGameInBasket.value,
     )
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
 const handleReviewSubmit = async (payload: GameReviewPayload): Promise<void> => {
+  if (!routeGameId.value) {
+    return
+  }
+
   if (!isAuthenticated.value) {
     requestAuthPrompt()
     return
@@ -359,11 +385,15 @@ const handleReviewSubmit = async (payload: GameReviewPayload): Promise<void> => 
 
     await refreshAfterReviewMutation()
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
 const handleReviewDelete = async (): Promise<void> => {
+  if (!routeGameId.value) {
+    return
+  }
+
   if (!myReview.value) {
     return
   }
@@ -372,7 +402,7 @@ const handleReviewDelete = async (): Promise<void> => {
     await deleteMyGameReview(routeGameId.value)
     await refreshAfterReviewMutation()
   } catch (error: unknown) {
-    showApiError(error)
+    showPageApiError(error)
   }
 }
 
@@ -412,19 +442,28 @@ onMounted(() => {
   loadUserMarksSafely()
 })
 
+onBeforeUnmount(() => {
+  isPageActive = false
+})
+
 watch([isSessionInitialized, isAuthenticated], async () => {
+  if (!routeGameId.value) {
+    return
+  }
+
   await loadUserMarksSafely()
   await loadGameReviews()
 })
 
-watch(
-  () => route.params.id,
-  () => {
-    selectedMediaId.value = null
-    isMediaDialogVisible.value = false
-    resetGameReviews()
-    loadGame()
-    loadGameReviews()
-  },
-)
+watch(routeGameId, () => {
+  if (!routeGameId.value) {
+    return
+  }
+
+  selectedMediaId.value = null
+  isMediaDialogVisible.value = false
+  resetGameReviews()
+  loadGame()
+  loadGameReviews()
+})
 </script>

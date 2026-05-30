@@ -52,7 +52,7 @@
       :games="sortedGames"
       :has-more="gamesPagination.hasNextPage"
       :is-loading-more="isGamesLoadingMore"
-      :load-more-error="loadMoreError"
+      :load-more-error="loadMoreErrorMessage"
       :total="gamesPagination.total"
       @delete="requestDeleteGame"
       @edit="openEditGame"
@@ -129,7 +129,7 @@ const editingGame = ref<AdminGame | null>(null)
 const isEditLoading = ref(false)
 const isReordering = ref(false)
 const loadMoreError = ref<string | null>(null)
-const pageLimit = 20
+const pageLimit = 10
 const scrollLoadThreshold = 420
 let searchTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -138,6 +138,10 @@ const sortOptions = computed(() => [
   { label: t('admin.games.sort.createdDesc'), value: 'created_desc' },
   { label: t('admin.games.sort.createdAsc'), value: 'created_asc' },
 ])
+
+const loadMoreErrorMessage = computed(() =>
+  loadMoreError.value ? getMessage(loadMoreError.value) : null,
+)
 
 const getDateTime = (value: string | undefined): number => {
   if (!value) {
@@ -227,7 +231,7 @@ const loadMoreGames = async (): Promise<void> => {
     queueScrollCheck()
   } catch (error: unknown) {
     const apiError = toApiError(error)
-    loadMoreError.value = getMessage(apiError.message)
+    loadMoreError.value = apiError.message
     showApiError(apiError)
   }
 }

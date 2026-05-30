@@ -32,6 +32,23 @@ export interface GameTag {
   type: GameTagType[]
 }
 
+export interface GameTagTypeWithTags {
+  id: string
+  name: string
+  sort_order: number
+  tags_count?: number
+  tags?: GameSearchTag[]
+}
+
+export interface GameSearchTag {
+  id: string
+  name: string
+  created_at?: string
+  games_count?: number
+  type?: GameTagType
+  type_id?: string
+}
+
 export interface GameTagType {
   id: string
   name: string
@@ -63,4 +80,22 @@ export interface GameVideo {
   duration?: number
   created_at?: string
   game_id?: string
+}
+
+export interface GameListParams {
+  limit?: number
+  page?: number
+  search?: string
+  tagIds?: string[]
+  tagMode?: 'all' | 'any'
+}
+
+export interface GamePaginationState {
+  count: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  limit: number
+  page: number
+  total: number
+  totalPages: number
 }

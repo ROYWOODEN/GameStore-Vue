@@ -124,6 +124,142 @@ body {
   color: var(--color-primary) !important;
 }
 
+.p-inputtext,
+.p-select,
+.p-multiselect {
+  border-color: var(--color-outline-variant) !important;
+  background: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-inputtext::placeholder,
+.p-multiselect-label.p-placeholder,
+.p-select-label.p-placeholder {
+  color: var(--color-search-icon) !important;
+  opacity: 1 !important;
+}
+
+.p-floatlabel label {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.p-floatlabel:has(.p-focus) label,
+.p-floatlabel:has(.p-inputwrapper-focus) label,
+.p-floatlabel:has(.p-filled) label {
+  color: var(--color-primary) !important;
+}
+
+.p-multiselect-label,
+.p-select-label {
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+.p-multiselect-dropdown,
+.p-multiselect-dropdown-icon {
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+.p-multiselect:not(.p-disabled):hover .p-multiselect-dropdown,
+.p-multiselect.p-focus .p-multiselect-dropdown {
+  color: var(--color-primary) !important;
+}
+
+.p-multiselect-overlay,
+.p-select-overlay {
+  border-color: var(--color-outline-variant) !important;
+  background: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-multiselect-filter {
+  border-color: var(--color-outline-variant) !important;
+  background: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-multiselect-option,
+.p-select-option {
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+.p-multiselect-option:not(.p-disabled):hover,
+.p-select-option:not(.p-disabled):hover {
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-multiselect-option.p-focus,
+.p-select-option.p-focus,
+.p-multiselect-option.p-selected,
+.p-select-option.p-selected {
+  background: var(--color-menu-active-bg) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-multiselect-option-group {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+}
+
+.p-checkbox-box {
+  border-color: var(--color-outline) !important;
+  background: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+.p-checkbox-checked .p-checkbox-box {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+}
+
+.p-paginator {
+  background: var(--color-surface-container-lowest) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-paginator-current {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.p-paginator-page,
+.p-paginator-first,
+.p-paginator-prev,
+.p-paginator-next,
+.p-paginator-last {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 1 !important;
+}
+
+.p-paginator-page.p-paginator-page-selected,
+.p-paginator-page.p-highlight {
+  background: var(--color-menu-active-bg) !important;
+  color: var(--color-on-surface) !important;
+}
+
+.p-paginator-first:not(.p-disabled):hover,
+.p-paginator-prev:not(.p-disabled):hover,
+.p-paginator-next:not(.p-disabled):hover,
+.p-paginator-last:not(.p-disabled):hover,
+.p-paginator-page:not(.p-disabled):hover {
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-primary) !important;
+}
+
+.p-paginator .p-disabled {
+  color: var(--color-outline) !important;
+  opacity: 0.65 !important;
+}
+
 .profile-confirm-cancel-button {
   border-color: var(--color-outline-variant) !important;
   background: transparent !important;

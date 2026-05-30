@@ -12,3 +12,9 @@ export const formatRubPrice = (value: number | string): string => {
     style: 'currency',
   }).format(amount)
 }
+
+export const isFreePrice = (value: number | string): boolean => {
+  const amount = typeof value === 'number' ? value : Number.parseFloat(value)
+
+  return Number.isFinite(amount) && amount === 0
+}

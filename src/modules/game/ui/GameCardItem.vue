@@ -129,15 +129,29 @@
     </template>
 
     <template #footer>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex min-w-0 flex-col gap-2">
+      <div class="grid gap-2">
+        <div class="min-h-8">
           <div
+            v-if="!isOwned"
             class="text-[1.15rem] leading-none font-bold text-(--color-on-surface) min-[560px]:text-[1.35rem]"
+            :class="isFree ? 'text-(--color-primary)!' : ''"
           >
             {{ formattedPrice }}
           </div>
+          <div
+            v-else
+            class="text-[1.15rem] leading-none font-bold opacity-0 min-[560px]:text-[1.35rem]"
+            aria-hidden="true"
+          >
+            {{ formattedPrice }}
+          </div>
+        </div>
 
-          <div class="flex items-center gap-1.5" :aria-label="t('game.platforms')">
+        <div class="grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <div
+            class="flex min-w-0 flex-wrap items-center gap-1.5"
+            :aria-label="t('game.platforms')"
+          >
             <span
               v-for="platform in platformTags"
               :key="platform.name"
@@ -147,52 +161,52 @@
               <VueIcon :name="getPlatformIcon(platform)" />
             </span>
           </div>
+
+          <Button
+            v-if="isOwned"
+            class="min-w-28 justify-center! gap-1.5! rounded-lg! border-(--color-primary)! bg-(--color-primary)! px-3! py-2.5! text-[0.875rem]! font-semibold! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!"
+            type="button"
+            :aria-label="t('game.play')"
+            @click.stop
+          >
+            <VueIcon name="bs:play-fill" class="text-[1.25rem] min-[560px]:text-[1.45rem]" />
+            <span>{{ t('game.play') }}</span>
+          </Button>
+
+          <Button
+            v-else
+            :class="[
+              'min-w-28 justify-center! gap-1.5! rounded-lg! px-3! py-2.5! text-[0.875rem]! font-semibold! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!',
+              isInBasket
+                ? 'border-(--color-primary)! bg-(--color-surface-container-high)! text-(--color-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-surface-container-highest)!'
+                : 'border-(--color-primary)! bg-(--color-primary)! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)!',
+              isBasketPending ? 'cursor-wait! opacity-85' : '',
+            ]"
+            type="button"
+            :aria-label="basketLabel"
+            :disabled="isBasketPending"
+            @click.stop="emit('basketToggle', { id: game.id, price: game.price })"
+          >
+            <AnimatePresence mode="wait">
+              <motion.span
+                :key="basketIconKey"
+                class="flex"
+                :initial="{ opacity: 0, y: 8, scale: 0.92 }"
+                :animate="{ opacity: 1, y: 0, scale: 1 }"
+                :exit="{ opacity: 0, y: -8, scale: 0.92 }"
+                :transition="{ duration: 0.16, ease: 'easeOut' }"
+              >
+                <i v-if="isBasketPending" class="pi pi-spin pi-spinner text-base" />
+                <VueIcon
+                  v-else
+                  :name="basketIconName"
+                  class="text-[1.25rem] min-[560px]:text-[1.45rem]"
+                />
+              </motion.span>
+            </AnimatePresence>
+            <span>{{ basketButtonText }}</span>
+          </Button>
         </div>
-
-        <Button
-          v-if="isOwned"
-          class="min-w-28 justify-center! gap-1.5! rounded-lg! border-(--color-primary)! bg-(--color-primary)! px-3! py-2.5! text-[0.875rem]! font-semibold! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!"
-          type="button"
-          :aria-label="t('game.play')"
-          @click.stop
-        >
-          <VueIcon name="bs:play-fill" class="text-[1.25rem] min-[560px]:text-[1.45rem]" />
-          <span>{{ t('game.play') }}</span>
-        </Button>
-
-        <Button
-          v-else
-          :class="[
-            'min-w-28 justify-center! gap-1.5! rounded-lg! px-3! py-2.5! text-[0.875rem]! font-semibold! min-[560px]:min-w-32 min-[560px]:gap-2! min-[560px]:px-4! min-[560px]:py-3! min-[560px]:text-[0.95rem]!',
-            isInBasket
-              ? 'border-(--color-primary)! bg-(--color-surface-container-high)! text-(--color-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-surface-container-highest)!'
-              : 'border-(--color-primary)! bg-(--color-primary)! text-(--color-on-primary)! hover:border-(--color-primary-strong)! hover:bg-(--color-primary-strong)!',
-            isBasketPending ? 'cursor-wait! opacity-85' : '',
-          ]"
-          type="button"
-          :aria-label="basketLabel"
-          :disabled="isBasketPending"
-          @click.stop="emit('basketToggle', { id: game.id, price: game.price })"
-        >
-          <AnimatePresence mode="wait">
-            <motion.span
-              :key="basketIconKey"
-              class="flex"
-              :initial="{ opacity: 0, y: 8, scale: 0.92 }"
-              :animate="{ opacity: 1, y: 0, scale: 1 }"
-              :exit="{ opacity: 0, y: -8, scale: 0.92 }"
-              :transition="{ duration: 0.16, ease: 'easeOut' }"
-            >
-              <i v-if="isBasketPending" class="pi pi-spin pi-spinner text-base" />
-              <VueIcon
-                v-else
-                :name="basketIconName"
-                class="text-[1.25rem] min-[560px]:text-[1.45rem]"
-              />
-            </motion.span>
-          </AnimatePresence>
-          <span>{{ basketButtonText }}</span>
-        </Button>
       </div>
     </template>
   </Card>
@@ -200,7 +214,7 @@
 
 <script setup lang="ts">
 import { buildAssetUrl } from '@/shared/lib/url'
-import { formatRubPrice } from '@/shared/lib/price'
+import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
 import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
@@ -250,7 +264,8 @@ const coverImage = computed(
 )
 const coverImageUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverImageAlt = computed(() => coverImage.value?.alt || props.game.title)
-const formattedPrice = computed(() => formatRubPrice(props.game.price))
+const isFree = computed(() => isFreePrice(props.game.price))
+const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
 const ratingAverage = computed(() => props.game.rating?.average ?? null)
 const ratingCount = computed(() => props.game.rating?.count ?? 0)
 const hasRating = computed(() => ratingAverage.value !== null && ratingCount.value > 0)

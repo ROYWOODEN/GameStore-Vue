@@ -21,6 +21,11 @@ const router = createRouter({
       redirect: { name: 'main' },
     },
     {
+      path: '/search',
+      name: 'search',
+      component: () => import('@/pages/SearchPage/SearchPage.vue'),
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/ProfilePage/ProfilePage.vue'),
