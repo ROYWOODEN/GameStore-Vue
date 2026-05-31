@@ -29,7 +29,9 @@ export const ru = {
       external: 'Внешнее видео',
       externalDescription:
         'Эта ссылка ведёт на внешний плеер. Встроенный браузерный проигрыватель сможет открыть её только если сервер отдаёт прямой видеофайл.',
+      next: 'Следующее медиа',
       openExternal: 'Открыть видео',
+      previous: 'Предыдущее медиа',
     },
     price: 'Цена',
     rating: {
@@ -234,9 +236,11 @@ export const ru = {
   header: {
     cart: 'Корзина',
     cartWithCount: 'Корзина, игр: {count}',
+    closeSearch: 'Закрыть поиск',
     language: 'EN',
     login: 'Войти',
     notifications: 'Уведомления',
+    openSearch: 'Открыть поиск',
     searchLabel: 'Поиск игр',
     switchLanguage: 'Переключить язык',
     themeDark: 'Темная',
@@ -362,12 +366,24 @@ export const ru = {
       waiting_for_payment: 'Ожидает оплаты',
     },
   },
+  notFound: {
+    description:
+      'Такой страницы нет в GameStore. Адрес мог измениться, игра могла исчезнуть, или ссылка была набрана с ошибкой.',
+    eyebrow: 'Страница не найдена',
+    home: 'На главную',
+    requested: 'Запрошенный адрес',
+    search: 'К поиску',
+    title: 'Здесь ничего не найдено',
+  },
   sidebar: {
     catalog: 'Каталог',
+    closeMenu: 'Закрыть меню',
     exit: 'Выход',
     favorites: 'Избранное',
     library: 'Библиотека',
     main: 'Главная',
+    more: 'Меню',
+    openMenu: 'Открыть меню',
     settings: 'Настройки',
   },
   settings: {

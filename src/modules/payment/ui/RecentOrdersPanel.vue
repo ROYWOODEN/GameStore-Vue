@@ -9,13 +9,21 @@
           {{ t('payment.recent.subtitle') }}
         </p>
       </div>
+      <div
+        v-if="loading"
+        class="grid h-12 w-12 min-w-12 place-items-center rounded-full bg-(--color-menu-active-bg) text-(--color-primary)"
+        role="status"
+        :aria-label="t('payment.recent.refresh')"
+      >
+        <i class="pi pi-spin pi-spinner text-[1.35rem]" />
+      </div>
       <Button
+        v-else
         text
         rounded
         class="h-12! w-12! min-w-12! p-0! text-(--color-on-surface-variant)! hover:text-(--color-primary)!"
         type="button"
         :aria-label="t('payment.recent.refresh')"
-        :loading="loading"
         @click="emit('refresh')"
       >
         <VueIcon name="bs:arrow-clockwise" class="text-[1.65rem]" />

@@ -69,6 +69,7 @@
 
       <Paginator
         v-if="tagsPagination.total > tagsPagination.limit"
+        class="admin-tags-paginator"
         :first="(tagsPagination.page - 1) * tagsPagination.limit"
         :rows="tagsPagination.limit"
         :total-records="tagsPagination.total"

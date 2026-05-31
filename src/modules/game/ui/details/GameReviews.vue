@@ -138,21 +138,21 @@
           v-for="review in reviews"
           :key="getReviewKey(review)"
           layout
-          class="grid gap-4 rounded-xl border border-(--color-outline-variant) bg-(--color-surface-container-high) p-5"
-          :initial="{ opacity: 0, y: 24, scale: 0.98 }"
-          :while-in-view="{ opacity: 1, y: 0, scale: 1 }"
-          :exit="{ opacity: 0, y: 14, scale: 0.96 }"
-          :viewport="{ once: true, amount: 0.18 }"
-          :transition="{ duration: 0.26, ease: 'easeOut' }"
+          class="mobile-motion-layer grid gap-4 rounded-xl border border-(--color-outline-variant) bg-(--color-surface-container-high) p-5"
+          :initial="reviewItemInitial"
+          :while-in-view="reviewItemInView"
+          :exit="reviewItemExit"
+          :viewport="reviewItemViewport"
+          :transition="reviewItemTransition"
         >
           <div class="flex items-start gap-4">
             <div
               class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-(--color-primary) text-sm font-black text-(--color-on-primary)"
             >
               <img
-                v-if="review.user?.avatar_url"
+                v-if="getReviewAvatarUrl(review)"
                 class="h-full w-full object-cover"
-                :src="review.user.avatar_url"
+                :src="getReviewAvatarUrl(review) ?? undefined"
                 :alt="getReviewAuthorName(review)"
               />
               <span v-else>{{ getReviewInitials(review) }}</span>
@@ -190,6 +190,8 @@
 
 <script setup lang="ts">
 import type { GameReview, GameReviewPayload } from '@/modules/game'
+import { buildAssetUrl } from '@/shared/lib/url'
+import { useMediaQuery } from '@vueuse/core'
 import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
 import Rating from 'primevue/rating'
@@ -214,6 +216,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const apiUrl = import.meta.env.VITE_API_URL
+const isMobileViewport = useMediaQuery('(max-width: 760px)')
 const isEditingReview = ref(false)
 const reviewRating = ref<number | undefined>()
 const reviewText = ref('')
@@ -247,6 +251,23 @@ const submitLabel = computed(() => {
 
   return props.myReview ? t('gameDetails.reviews.update') : t('gameDetails.reviews.create')
 })
+const reviewItemInitial = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 14 } : { opacity: 0, y: 24, scale: 0.98 },
+)
+const reviewItemInView = computed(() =>
+  isMobileViewport.value ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, scale: 1 },
+)
+const reviewItemExit = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 10 } : { opacity: 0, y: 14, scale: 0.96 },
+)
+const reviewItemViewport = computed(() => ({
+  once: true,
+  amount: isMobileViewport.value ? 0.08 : 0.18,
+}))
+const reviewItemTransition = computed(() => ({
+  duration: isMobileViewport.value ? 0.22 : 0.26,
+  ease: 'easeOut' as const,
+}))
 
 const setFormFromReview = (review: GameReview | null): void => {
   reviewRating.value = review?.rating
@@ -286,6 +307,9 @@ const getReviewInitials = (review: GameReview): string =>
     .join('') || 'U'
 
 const getReviewText = (review: GameReview): string => review.text?.trim() ?? ''
+
+const getReviewAvatarUrl = (review: GameReview): string | null =>
+  buildAssetUrl(review.user?.avatar_url, apiUrl)
 
 const getReviewKey = (review: GameReview): string =>
   String(review.id ?? `${review.user_id ?? 'user'}-${review.created_at ?? review.rating}`)

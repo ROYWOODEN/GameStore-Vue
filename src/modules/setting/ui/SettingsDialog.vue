@@ -8,7 +8,7 @@
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
     :pt="dialogPassThrough"
   >
-    <div class="flex min-h-100 gap-8 max-sm:min-h-128 max-sm:flex-col max-sm:gap-5">
+    <div class="flex min-h-100 gap-8 max-sm:min-h-0 max-sm:flex-col max-sm:gap-5">
       <nav
         class="flex w-60 shrink-0 flex-col gap-2 border-r border-(--color-outline-variant) pr-5 max-sm:w-full max-sm:border-r-0 max-sm:border-b max-sm:pb-4 max-sm:pr-0"
       >
@@ -39,13 +39,12 @@
         </button>
       </nav>
 
-      <section class="relative min-w-0 flex-1 overflow-hidden">
+      <section class="relative min-w-0 flex-1">
         <motion.div
           :key="activeSection"
           :initial="{ opacity: 0, x: 18 }"
           :animate="{ opacity: 1, x: 0 }"
           :transition="{ duration: 0.22, ease: 'easeOut' }"
-          class="absolute inset-0"
         >
           <div v-if="activeSection === 'theme'" class="space-y-6">
             <h3 class="text-2xl font-semibold text-(--color-on-surface)">
@@ -243,7 +242,8 @@ const dialogPassThrough = {
     class: 'text-3xl! font-bold!',
   },
   content: {
-    class: 'bg-(--color-surface-container)! px-8! pb-8! text-(--color-on-surface)!',
+    class:
+      'max-h-[min(76vh,calc(100dvh-7rem))]! overflow-y-auto! overscroll-contain bg-(--color-surface-container)! px-8! pb-8! text-(--color-on-surface)!',
   },
   mask: {
     class: 'backdrop-blur-sm!',

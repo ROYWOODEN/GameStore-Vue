@@ -1,21 +1,25 @@
 <template>
   <motion.section
-    class="rounded-md border border-(--color-outline-variant) bg-(--color-surface-container) p-6 text-(--color-on-surface) shadow-sm min-[760px]:p-8"
+    class="min-w-0 overflow-hidden rounded-md border border-(--color-outline-variant) bg-(--color-surface-container) p-4 text-(--color-on-surface) shadow-sm min-[560px]:p-6 min-[760px]:p-8"
     :initial="{ opacity: 0, y: 24 }"
     :animate="{ opacity: 1, y: 0 }"
     :transition="{ duration: 0.34, ease: 'easeOut', delay: 0.04 }"
   >
-    <div class="mb-7 flex items-center gap-4 border-b border-(--color-outline-variant) pb-5">
+    <div
+      class="mb-7 flex min-w-0 items-center gap-4 border-b border-(--color-outline-variant) pb-5"
+    >
       <span
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-(--color-menu-active-bg) text-xl text-(--color-primary)"
       >
         <VueIcon name="bs:person" />
       </span>
-      <h2 class="text-2xl font-bold">{{ t('profile.info.title') }}</h2>
+      <h2 class="min-w-0 text-2xl leading-tight font-bold break-words">
+        {{ t('profile.info.title') }}
+      </h2>
     </div>
 
     <form class="grid gap-7" @submit.prevent="emit('save')">
-      <div class="flex flex-col gap-5 min-[700px]:flex-row min-[700px]:items-center">
+      <div class="flex min-w-0 flex-col gap-5 min-[700px]:flex-row min-[700px]:items-center">
         <motion.div
           :class="[
             'relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-(--color-menu-active-bg) text-3xl font-bold text-(--color-primary) shadow-md transition-colors',
@@ -41,7 +45,7 @@
           </span>
         </motion.div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex min-w-0 flex-wrap items-center gap-3">
           <input
             ref="avatarInput"
             class="hidden"
@@ -50,7 +54,7 @@
             @change="handleAvatarChange"
           />
           <button
-            class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) px-4 text-sm font-semibold text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:text-(--color-primary)"
+            class="inline-flex min-h-10 min-w-0 cursor-pointer items-center gap-2 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) px-4 py-2 text-sm font-semibold text-(--color-on-surface) transition-colors hover:border-(--color-primary) hover:text-(--color-primary) max-[420px]:w-full max-[420px]:justify-center"
             type="button"
             @click="avatarInput?.click()"
           >
@@ -61,7 +65,7 @@
           </button>
           <button
             v-if="displayAvatarUrl"
-            class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border border-(--color-outline-variant) bg-transparent px-4 text-sm font-semibold text-(--color-on-surface-variant) transition-colors hover:border-(--color-error) hover:text-(--color-error) disabled:cursor-not-allowed disabled:opacity-60"
+            class="inline-flex min-h-10 min-w-0 cursor-pointer items-center gap-2 rounded-md border border-(--color-outline-variant) bg-transparent px-4 py-2 text-sm font-semibold text-(--color-on-surface-variant) transition-colors hover:border-(--color-error) hover:text-(--color-error) disabled:cursor-not-allowed disabled:opacity-60 max-[420px]:w-full max-[420px]:justify-center"
             type="button"
             :disabled="isAvatarDeleting"
             @click="emit('removeAvatar')"
@@ -71,10 +75,10 @@
           </button>
           <span
             v-if="hasUnsavedChanges"
-            class="inline-flex h-8 items-center gap-2 rounded-md bg-(--color-menu-active-bg) px-3 text-xs font-semibold text-(--color-primary)"
+            class="inline-flex min-h-8 min-w-0 items-center gap-2 rounded-md bg-(--color-menu-active-bg) px-3 py-1.5 text-xs font-semibold text-(--color-primary)"
           >
             <VueIcon name="bs:info-circle" />
-            <span>{{ t('profile.messages.unsaved') }}</span>
+            <span class="min-w-0 break-words">{{ t('profile.messages.unsaved') }}</span>
           </span>
           <p class="w-full text-xs text-(--color-on-surface-variant)">
             {{ t('profile.avatar.hint') }}
@@ -83,8 +87,10 @@
       </div>
 
       <div class="grid gap-5 min-[760px]:grid-cols-2">
-        <label class="grid gap-2">
-          <span class="text-xs font-semibold uppercase text-(--color-on-surface-variant)">
+        <label class="grid min-w-0 gap-2">
+          <span
+            class="text-xs leading-5 font-semibold break-words text-(--color-on-surface-variant) uppercase"
+          >
             {{ t('profile.fields.displayName') }}
             <span v-if="dirtyFields.name" class="ml-2 text-(--color-primary)">
               {{ t('profile.messages.changed') }}
@@ -101,8 +107,10 @@
           </span>
         </label>
 
-        <label class="grid gap-2">
-          <span class="text-xs font-semibold uppercase text-(--color-on-surface-variant)">
+        <label class="grid min-w-0 gap-2">
+          <span
+            class="text-xs leading-5 font-semibold break-words text-(--color-on-surface-variant) uppercase"
+          >
             {{ t('profile.fields.email') }}
             <span v-if="dirtyFields.email" class="ml-2 text-(--color-primary)">
               {{ t('profile.messages.changed') }}
@@ -120,8 +128,10 @@
         </label>
       </div>
 
-      <label class="grid gap-2">
-        <span class="text-xs font-semibold uppercase text-(--color-on-surface-variant)">
+      <label class="grid min-w-0 gap-2">
+        <span
+          class="text-xs leading-5 font-semibold break-words text-(--color-on-surface-variant) uppercase"
+        >
           {{ t('profile.fields.newPassword') }}
           <span v-if="dirtyFields.password" class="ml-2 text-(--color-primary)">
             {{ t('profile.messages.changed') }}
@@ -159,13 +169,16 @@
         </span>
       </label>
 
-      <div class="flex justify-end">
-        <div class="grid justify-items-end gap-2">
-          <span v-if="hasUnsavedChanges" class="text-xs font-semibold text-(--color-primary)">
+      <div class="flex min-w-0 justify-end">
+        <div class="grid min-w-0 justify-items-end gap-2 max-[420px]:w-full">
+          <span
+            v-if="hasUnsavedChanges"
+            class="text-right text-xs leading-5 font-semibold break-words text-(--color-primary)"
+          >
             {{ t('profile.messages.saveRequired') }}
           </span>
           <button
-            class="inline-flex h-11 cursor-pointer items-center gap-2 rounded-md bg-(--color-primary) px-6 text-sm font-bold text-(--color-on-primary) transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md bg-(--color-primary) px-6 py-2.5 text-sm font-bold text-(--color-on-primary) transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 max-[420px]:w-full"
             type="submit"
             :disabled="isSaving || !hasUnsavedChanges"
           >
@@ -224,7 +237,7 @@ const { t } = useI18n()
 const avatarInput = ref<HTMLInputElement | null>(null)
 
 const inputClass =
-  'h-12 rounded-md border bg-(--color-surface-container-high) px-4 text-sm text-(--color-on-surface) outline-none transition-colors focus:border-(--color-primary)'
+  'h-12 min-w-0 rounded-md border bg-(--color-surface-container-high) px-4 text-sm text-(--color-on-surface) outline-none transition-colors focus:border-(--color-primary)'
 const idleBorderClass = 'border-(--color-outline-variant)'
 const errorBorderClass = 'border-(--color-error)'
 const dirtyBorderClass = 'border-(--color-primary) ring-1 ring-(--color-primary)'
