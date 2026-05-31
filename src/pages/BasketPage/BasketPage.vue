@@ -172,6 +172,7 @@ import {
   type OrderStatus,
 } from '@/modules/payment'
 import { isApiError } from '@/shared/api/error'
+import { isFreePrice } from '@/shared/lib/price'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
@@ -346,6 +347,20 @@ const handleSelectAllChange = (selected: boolean): void => {
   setSelectedBasketIds([])
 }
 
+const notifyFreeCheckoutCompleted = (orderId: string): void => {
+  if (hasPaidNoticeBeenShown(orderId)) {
+    return
+  }
+
+  rememberPaidNotice(orderId)
+  toast.add({
+    severity: 'success',
+    summary: t('payment.status.paid'),
+    detail: t('payment.recent.paidDescription'),
+    life: 3000,
+  })
+}
+
 const handleCheckout = async (): Promise<void> => {
   if (selectedBasketItems.value.length === 0) {
     toast.add({
@@ -360,18 +375,28 @@ const handleCheckout = async (): Promise<void> => {
   try {
     const selectedGameIds = selectedBasketItems.value.map((game) => game.id)
     const payment = await createCheckout(selectedGameIds)
+    const orderId = String(payment.orderId)
     previousOrderStatuses.value = {
       ...previousOrderStatuses.value,
-      [String(payment.orderId)]: 'waiting_for_payment',
+      [orderId]: 'waiting_for_payment',
     }
-    void handleRefreshOrders()
 
     if (payment.confirmationUrl) {
+      void handleRefreshOrders()
       window.location.href = payment.confirmationUrl
       return
     }
 
-    void pollOrderUntilTerminal(String(payment.orderId))
+    if (isFreePrice(payment.amount) || isFreePrice(selectedTotalAmount.value)) {
+      const basketReloaded = await handleRefreshOrders()
+      if (!basketReloaded) {
+        await loadBasketPage()
+      }
+      notifyFreeCheckoutCompleted(orderId)
+      return
+    }
+
+    void pollOrderUntilTerminal(orderId)
     toast.add({
       severity: 'warn',
       summary: t('basketPage.checkoutUnavailableTitle'),

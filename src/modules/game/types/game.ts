@@ -10,6 +10,18 @@ export interface GameListItem {
   media: GameMedia
 }
 
+export interface CatalogGenre {
+  id: string
+  name: string
+  games_count: number
+  cover: CatalogGenreCover | null
+}
+
+export interface CatalogGenreCover {
+  url: string
+  alt?: string | null
+}
+
 export interface Game {
   id: string
   title: string

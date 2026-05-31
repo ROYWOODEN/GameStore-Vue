@@ -17,13 +17,14 @@
             {{ t('admin.games.createDescription') }}
           </p>
         </div>
-        <RouterLink
+        <button
           class="inline-flex h-11 items-center gap-2 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) px-5 text-sm font-bold text-(--color-on-surface-variant) transition-colors hover:border-(--color-primary) hover:text-(--color-primary)"
-          to="/admin/games"
+          type="button"
+          @click="handleBackClick"
         >
           <VueIcon name="bs:arrow-left" />
           <span>{{ t('admin.games.backToList') }}</span>
-        </RouterLink>
+        </button>
       </div>
     </div>
 
@@ -50,6 +51,7 @@
 
 <script setup lang="ts">
 import { AdminGameForm, useAdminCatalog, type AdminGameFormPayload } from '@/modules/admin'
+import { goBackOrPush } from '@/shared/lib/navigation'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
@@ -78,6 +80,8 @@ const loadPage = async (): Promise<void> => {
     showApiError(error)
   }
 }
+
+const handleBackClick = (): Promise<void> => goBackOrPush(router, '/admin/games')
 
 const handleCreateGame = async (payload: AdminGameFormPayload): Promise<void> => {
   try {
