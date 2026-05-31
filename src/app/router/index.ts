@@ -91,6 +91,20 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/404',
+      name: 'not-found',
+      component: () => import('@/pages/NotFoundPage/NotFoundPage.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: (to) => ({
+        name: 'not-found',
+        query: {
+          from: to.fullPath,
+        },
+      }),
+    },
   ],
 })
 

@@ -72,7 +72,7 @@
 
     <div class="grid gap-3 border-t border-(--color-outline-variant) pt-4">
       <h2 class="text-xl font-bold">{{ t('gameDetails.rating.title') }}</h2>
-      <div class="flex items-center gap-4">
+      <div v-if="hasRating" class="flex items-center gap-4">
         <span class="min-w-16 text-5xl font-black">{{ ratingScoreLabel }}</span>
         <div class="grid gap-1">
           <Rating class="game-rating" :model-value="ratingValue" readonly :cancel="false" />
@@ -81,7 +81,18 @@
           </span>
         </div>
       </div>
-      <p class="text-xs leading-5 text-(--color-on-surface-variant)">
+      <div
+        v-else
+        class="flex items-center gap-3 rounded-md border border-dashed border-(--color-outline-variant) bg-(--color-surface-container-high) px-3 py-3 text-(--color-on-surface-variant)"
+      >
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-(--color-menu-active-bg) text-xl text-(--color-primary)"
+        >
+          <VueIcon name="bs:star" />
+        </span>
+        <span class="text-sm font-bold">{{ t('gameDetails.rating.empty') }}</span>
+      </div>
+      <p v-if="hasRating" class="text-xs leading-5 text-(--color-on-surface-variant)">
         {{ t('gameDetails.rating.caption') }}
       </p>
     </div>
@@ -140,7 +151,7 @@ const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRub
 const hasRating = computed(() => props.rating !== null && props.ratingCount > 0)
 const ratingValue = computed(() => Math.min(5, Math.max(0, props.rating ?? 0)))
 const ratingScoreLabel = computed(() =>
-  hasRating.value && props.rating !== null ? formatGameRating(props.rating) : '-',
+  props.rating !== null ? formatGameRating(props.rating) : '',
 )
 const ratingCountLabel = computed(() =>
   hasRating.value

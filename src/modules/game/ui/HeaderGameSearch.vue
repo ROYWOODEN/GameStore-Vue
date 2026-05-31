@@ -1,8 +1,5 @@
 <template>
-  <div
-    ref="rootRef"
-    class="group relative w-[clamp(220px,28vw,420px)] shrink-0 min-[1280px]:w-[clamp(260px,34vw,460px)]"
-  >
+  <div ref="rootRef" class="group relative min-w-0 shrink-0">
     <FloatLabel variant="on">
       <IconField>
         <InputIcon
@@ -33,7 +30,7 @@
     <AnimatePresence>
       <motion.div
         v-if="isPanelVisible"
-        class="absolute top-[calc(100%+0.75rem)] left-0 z-50 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-lowest) shadow-[0_20px_55px_rgb(0_0_0/0.26)]"
+        class="absolute top-[calc(100%+0.75rem)] left-0 z-50 w-full min-w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-lowest) shadow-[0_20px_55px_rgb(0_0_0/0.26)] min-[640px]:w-[min(28rem,calc(100vw-2rem))]"
         :initial="{ opacity: 0, y: -8, scale: 0.98 }"
         :animate="{ opacity: 1, y: 0, scale: 1 }"
         :exit="{ opacity: 0, y: -8, scale: 0.98 }"

@@ -1,22 +1,26 @@
 <template>
   <motion.section
-    class="rounded-md border border-(--color-outline-variant) bg-(--color-surface-container) p-6 text-(--color-on-surface) shadow-sm"
+    class="min-w-0 overflow-hidden rounded-md border border-(--color-outline-variant) bg-(--color-surface-container) p-4 text-(--color-on-surface) shadow-sm min-[560px]:p-6"
     :initial="{ opacity: 0, x: 22 }"
     :animate="{ opacity: 1, x: 0 }"
     :transition="{ duration: 0.34, ease: 'easeOut', delay: 0.16 }"
   >
-    <div class="mb-5 flex items-center gap-4">
+    <div class="mb-5 flex min-w-0 items-center gap-4">
       <span
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-(--color-menu-active-bg) text-xl text-(--color-primary)"
       >
         <VueIcon name="bs:sliders" />
       </span>
-      <h2 class="text-2xl font-bold">{{ t('profile.preferences.title') }}</h2>
+      <h2 class="min-w-0 text-2xl leading-tight font-bold break-words">
+        {{ t('profile.preferences.title') }}
+      </h2>
     </div>
 
     <div class="grid gap-5">
-      <label class="grid gap-2">
-        <span class="text-xs font-semibold uppercase text-(--color-on-surface-variant)">
+      <label class="grid min-w-0 gap-2">
+        <span
+          class="text-xs leading-5 font-semibold break-words text-(--color-on-surface-variant) uppercase"
+        >
           {{ t('profile.preferences.language') }}
         </span>
         <select
@@ -30,13 +34,13 @@
       </label>
 
       <div
-        class="flex items-center justify-between gap-4 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) p-4"
+        class="flex min-w-0 flex-col items-start gap-4 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) p-4 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between"
       >
-        <span>
-          <span class="block text-sm font-bold">
+        <span class="min-w-0">
+          <span class="block text-sm leading-5 font-bold break-words">
             {{ t('profile.preferences.theme') }}
           </span>
-          <span class="mt-1 block text-xs text-(--color-on-surface-variant)">
+          <span class="mt-1 block text-xs leading-5 break-words text-(--color-on-surface-variant)">
             {{
               theme === 'dark'
                 ? t('profile.preferences.darkActive')

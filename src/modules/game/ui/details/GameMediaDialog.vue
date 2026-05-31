@@ -10,15 +10,36 @@
   >
     <div
       class="relative grid max-h-[82vh] min-h-72 place-items-center overflow-hidden bg-(--color-surface-container)"
+      @pointerdown.passive="handlePointerDown"
+      @pointerup.passive="handlePointerUp"
     >
       <button
-        class="absolute top-4 right-4 z-10 grid h-10 w-10 place-items-center rounded-full border border-white/30 bg-black/60 text-xl text-white backdrop-blur transition hover:bg-white hover:text-black"
+        class="absolute top-4 right-4 z-20 grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/60 text-xl text-white backdrop-blur transition hover:bg-white hover:text-black"
         type="button"
         :aria-label="t('gameDetails.closeMedia')"
         @click="visible = false"
       >
         <VueIcon name="bs:x" />
       </button>
+
+      <template v-if="canNavigate">
+        <button
+          class="absolute top-1/2 left-3 z-20 grid h-11 w-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/60 text-2xl text-white backdrop-blur transition hover:bg-white hover:text-black min-[640px]:left-5 min-[640px]:h-13 min-[640px]:w-13"
+          type="button"
+          :aria-label="t('gameDetails.media.previous')"
+          @click.stop="emit('previous')"
+        >
+          <VueIcon name="bs:chevron-left" />
+        </button>
+        <button
+          class="absolute top-1/2 right-3 z-20 grid h-11 w-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/60 text-2xl text-white backdrop-blur transition hover:bg-white hover:text-black min-[640px]:right-5 min-[640px]:h-13 min-[640px]:w-13"
+          type="button"
+          :aria-label="t('gameDetails.media.next')"
+          @click.stop="emit('next')"
+        >
+          <VueIcon name="bs:chevron-right" />
+        </button>
+      </template>
 
       <img
         v-if="media?.type === 'image'"
@@ -29,9 +50,10 @@
       />
       <img
         v-if="media?.type === 'image'"
-        class="relative z-1 max-h-[82vh] w-full object-contain"
+        class="relative z-1 max-h-[82vh] w-full touch-pan-y object-contain select-none"
         :src="media.url"
         :alt="media.alt"
+        draggable="false"
       />
       <video
         v-else-if="media?.isPlayable"
@@ -66,14 +88,52 @@
 <script setup lang="ts">
 import type { GameDetailMediaItem } from '@/modules/game/types/media'
 import Dialog from 'primevue/dialog'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-defineProps<{
+const props = defineProps<{
+  items: GameDetailMediaItem[]
   media: GameDetailMediaItem | undefined
+}>()
+
+const emit = defineEmits<{
+  next: []
+  previous: []
 }>()
 
 const visible = defineModel<boolean>('visible', { required: true })
 const { t } = useI18n()
+const pointerStartX = ref<number | null>(null)
+const swipeThreshold = 48
+const canNavigate = computed(() => props.items.length > 1)
+
+const handlePointerDown = (event: PointerEvent): void => {
+  if (!canNavigate.value || event.pointerType === 'mouse') {
+    return
+  }
+
+  pointerStartX.value = event.clientX
+}
+
+const handlePointerUp = (event: PointerEvent): void => {
+  if (!canNavigate.value || pointerStartX.value === null || event.pointerType === 'mouse') {
+    pointerStartX.value = null
+    return
+  }
+
+  const deltaX = event.clientX - pointerStartX.value
+  pointerStartX.value = null
+
+  if (Math.abs(deltaX) < swipeThreshold) {
+    return
+  }
+
+  if (deltaX < 0) {
+    emit('next')
+  } else {
+    emit('previous')
+  }
+}
 
 const dialogPassThrough = {
   mask: {

@@ -31,7 +31,9 @@ export const en = {
       external: 'External video',
       externalDescription:
         'This link points to an external player. The browser video player can open it only when the server returns a direct video file.',
+      next: 'Next media',
       openExternal: 'Open video',
+      previous: 'Previous media',
     },
     price: 'Price',
     rating: {
@@ -236,9 +238,11 @@ export const en = {
   header: {
     cart: 'Cart',
     cartWithCount: 'Cart, {count} games',
+    closeSearch: 'Close search',
     language: 'RU',
     login: 'Log in',
     notifications: 'Notifications',
+    openSearch: 'Open search',
     searchLabel: 'Search games',
     switchLanguage: 'Switch language',
     themeDark: 'Dark',
@@ -364,12 +368,24 @@ export const en = {
       waiting_for_payment: 'Waiting for payment',
     },
   },
+  notFound: {
+    description:
+      'This page does not exist in GameStore. The address may have changed, the game may be gone, or the link may contain a typo.',
+    eyebrow: 'Page not found',
+    home: 'Go home',
+    requested: 'Requested address',
+    search: 'Open search',
+    title: 'Nothing was found here',
+  },
   sidebar: {
     catalog: 'Catalog',
+    closeMenu: 'Close menu',
     exit: 'Exit',
     favorites: 'Favorites',
     library: 'Library',
     main: 'Main',
+    more: 'Menu',
+    openMenu: 'Open menu',
     settings: 'Settings',
   },
   settings: {

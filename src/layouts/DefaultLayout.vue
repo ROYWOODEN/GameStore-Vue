@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div class="min-h-screen bg-(--color-background)">
     <AppHeader />
     <AppSidebar />
     <AuthDialogHost />
     <slot>
-      <main class="ml-[20%] mt-20 min-h-[calc(100vh-5rem)] w-[80%] bg-(--color-background)">
+      <main
+        class="mt-20 min-h-[calc(100vh-5rem)] w-full bg-(--color-background) pb-24 lg:ml-[20%] lg:w-[80%] lg:pb-0"
+      >
         <PageLoader />
       </main>
     </slot>

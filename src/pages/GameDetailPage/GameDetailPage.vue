@@ -15,7 +15,7 @@
 
     <template v-else-if="game">
       <RouterLink
-        class="fixed top-24 left-[calc(20%+1.5rem)] z-40 inline-flex w-fit items-center gap-2 rounded-lg border border-(--color-outline-variant) bg-(--color-surface-container-high)/90 px-3 py-2 text-sm font-semibold text-(--color-on-surface-variant) shadow-lg backdrop-blur transition-colors hover:border-(--color-primary) hover:text-(--color-primary) max-[560px]:left-4"
+        class="fixed top-24 left-[calc(20%+1.5rem)] z-30 inline-flex w-fit items-center gap-2 rounded-lg border border-(--color-outline-variant) bg-(--color-surface-container-high)/90 px-3 py-2 text-sm font-semibold text-(--color-on-surface-variant) shadow-lg backdrop-blur transition-colors hover:border-(--color-primary) hover:text-(--color-primary) max-[560px]:left-4 lg:z-40"
         to="/"
       >
         <VueIcon name="bs:arrow-left" />
@@ -24,9 +24,9 @@
 
       <motion.section
         layout
-        :initial="{ opacity: 0, scale: 0.96, y: 26 }"
-        :animate="{ opacity: 1, scale: 1, y: 0 }"
-        :transition="{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }"
+        :initial="pageMotionInitial"
+        :animate="pageMotionAnimate"
+        :transition="pageMotionTransition"
         class="relative"
       >
         <div class="absolute inset-x-0 top-0 h-[34rem] overflow-hidden">
@@ -55,9 +55,9 @@
         >
           <section class="grid gap-5">
             <motion.div
-              :initial="{ opacity: 0, y: 20 }"
+              :initial="contentMotionInitial"
               :animate="{ opacity: 1, y: 0 }"
-              :transition="{ duration: 0.34, delay: 0.08, ease: 'easeOut' }"
+              :transition="contentMotionTransition"
               class="grid gap-3"
             >
               <div class="flex flex-wrap items-center gap-2">
@@ -72,18 +72,6 @@
             </motion.div>
 
             <GameMediaGallery :items="mediaItems" @select="selectMedia" />
-            <GameReviews
-              :can-review="canReview"
-              :is-authenticated="isAuthenticated"
-              :is-deleting="isReviewDeleting"
-              :is-loading="isReviewsLoading"
-              :is-owned="isCurrentGameOwned"
-              :is-saving="isReviewSaving"
-              :my-review="myReview"
-              :reviews="reviews"
-              @delete="handleReviewDelete"
-              @submit="handleReviewSubmit"
-            />
           </section>
 
           <GamePurchasePanel
@@ -99,9 +87,29 @@
             @basket-toggle="handleBasketToggle"
             @favorite-toggle="handleFavoriteToggle"
           />
+
+          <GameReviews
+            class="min-[1024px]:col-span-2"
+            :can-review="canReview"
+            :is-authenticated="isAuthenticated"
+            :is-deleting="isReviewDeleting"
+            :is-loading="isReviewsLoading"
+            :is-owned="isCurrentGameOwned"
+            :is-saving="isReviewSaving"
+            :my-review="myReview"
+            :reviews="reviews"
+            @delete="handleReviewDelete"
+            @submit="handleReviewSubmit"
+          />
         </div>
 
-        <GameMediaDialog v-model:visible="isMediaDialogVisible" :media="selectedMedia" />
+        <GameMediaDialog
+          v-model:visible="isMediaDialogVisible"
+          :items="mediaItems"
+          :media="selectedMedia"
+          @next="selectNextMedia"
+          @previous="selectPreviousMedia"
+        />
       </motion.section>
     </template>
   </main>
@@ -130,6 +138,7 @@ import { buildAssetUrl } from '@/shared/lib/url'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
+import { useMediaQuery } from '@vueuse/core'
 import { motion } from 'motion-v'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -173,6 +182,7 @@ const { getMessage } = useI18nMessage()
 const selectedMediaId = ref<string | null>(null)
 const isMediaDialogVisible = ref(false)
 const apiUrl = import.meta.env.VITE_API_URL
+const isMobileViewport = useMediaQuery('(max-width: 760px)')
 let userMarksLoaded = false
 let isPageActive = true
 
@@ -234,10 +244,54 @@ const tagGroups = computed(() => {
 
   return [...groups.entries()].map(([name, tags]) => ({ name, tags }))
 })
+const pageMotionInitial = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 16 } : { opacity: 0, scale: 0.96, y: 26 },
+)
+const pageMotionAnimate = computed(() =>
+  isMobileViewport.value ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 },
+)
+const pageMotionTransition = computed(() => ({
+  duration: isMobileViewport.value ? 0.3 : 0.45,
+  ease: [0.22, 1, 0.36, 1] as const,
+}))
+const contentMotionInitial = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 12 } : { opacity: 0, y: 20 },
+)
+const contentMotionTransition = computed(() => ({
+  duration: isMobileViewport.value ? 0.24 : 0.34,
+  delay: isMobileViewport.value ? 0.04 : 0.08,
+  ease: 'easeOut' as const,
+}))
 
 const selectMedia = (id: string): void => {
   selectedMediaId.value = id
   isMediaDialogVisible.value = true
+}
+
+const getSelectedMediaIndex = (): number =>
+  mediaItems.value.findIndex((item) => item.id === selectedMedia.value?.id)
+
+const selectNextMedia = (): void => {
+  if (mediaItems.value.length < 2) {
+    return
+  }
+
+  const currentIndex = getSelectedMediaIndex()
+  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % mediaItems.value.length : 0
+  selectedMediaId.value = mediaItems.value[nextIndex]?.id ?? null
+}
+
+const selectPreviousMedia = (): void => {
+  if (mediaItems.value.length < 2) {
+    return
+  }
+
+  const currentIndex = getSelectedMediaIndex()
+  const previousIndex =
+    currentIndex >= 0
+      ? (currentIndex - 1 + mediaItems.value.length) % mediaItems.value.length
+      : mediaItems.value.length - 1
+  selectedMediaId.value = mediaItems.value[previousIndex]?.id ?? null
 }
 
 const showPageApiError = (error: unknown): void => {

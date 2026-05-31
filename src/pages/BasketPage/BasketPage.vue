@@ -151,7 +151,7 @@
 
           <RecentOrdersPanel
             :orders="recentOrders"
-            :loading="isRecentOrdersLoading"
+            :loading="isOrdersPanelLoading"
             :status-loading-ids="orderStatusLoadingIds"
             @refresh="handleRefreshOrders"
             @refresh-order="handleRefreshOrder"
@@ -241,6 +241,7 @@ const terminalOrderStatuses = new Set<OrderStatus>(['paid', 'canceled', 'failed'
 const pollingOrderIds = new Set<string>()
 const notifiedPaidOrderIds = new Set<string>()
 const previousOrderStatuses = ref<Record<string, OrderStatus>>({})
+const ordersRefreshRequestCount = ref(0)
 let shouldPollOrders = true
 
 const isMissingOrderError = (error: unknown): boolean => {
@@ -269,6 +270,10 @@ const paidTransitionOrders = computed(() =>
       previousOrderStatuses.value[order.id] === 'waiting_for_payment' &&
       !hasPaidNoticeBeenShown(order.id),
   ),
+)
+const isOrdersRefreshPending = computed(() => ordersRefreshRequestCount.value > 0)
+const isOrdersPanelLoading = computed(
+  () => isOrdersRefreshPending.value || isRecentOrdersLoading.value,
 )
 
 const notifyPaidOrder = (order: OrderDetails): void => {
@@ -424,6 +429,8 @@ const startPendingOrdersPolling = (orders: OrderDetails[]): void => {
 }
 
 const handleRefreshOrders = async (selectAllAfterBasketRefresh = false): Promise<boolean> => {
+  ordersRefreshRequestCount.value += 1
+
   try {
     const pendingBeforeSync = await getPendingBasketOrders(false)
     rememberOrderStatuses(pendingBeforeSync)
@@ -446,6 +453,8 @@ const handleRefreshOrders = async (selectAllAfterBasketRefresh = false): Promise
   } catch (error: unknown) {
     showApiError(error)
     return false
+  } finally {
+    ordersRefreshRequestCount.value = Math.max(0, ordersRefreshRequestCount.value - 1)
   }
 }
 

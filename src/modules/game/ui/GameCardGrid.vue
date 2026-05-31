@@ -7,21 +7,17 @@
     <motion.div
       v-for="game in games"
       :key="game.id"
-      class="cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-primary)"
+      class="mobile-motion-layer cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-primary)"
       layout="position"
       role="button"
       tabindex="0"
-      :initial="{ opacity: 0, y: 28, scale: 0.96 }"
-      :animate="{ opacity: 1, y: 0, scale: 1 }"
-      :exit="{ opacity: 0, y: 16, scale: 0.92 }"
-      :while-hover="{ y: -8, scale: 1.015 }"
+      :initial="cardInitial"
+      :while-in-view="cardInView"
+      :viewport="cardViewport"
+      :exit="cardExit"
+      :while-hover="cardHover"
       :while-tap="{ scale: 0.985 }"
-      :transition="{
-        layout: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
-        opacity: { duration: 0.22, ease: 'easeOut' },
-        y: { duration: 0.28, ease: 'easeOut' },
-        scale: { duration: 0.18, ease: 'easeOut' },
-      }"
+      :transition="cardTransition"
       @click="emit('gameSelect', game.id)"
       @keydown.enter.prevent="emit('gameSelect', game.id)"
       @keydown.space.prevent="emit('gameSelect', game.id)"
@@ -42,6 +38,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v'
+import { useMediaQuery } from '@vueuse/core'
 import { computed } from 'vue'
 import type { GameListItem } from '../types/game'
 import GameCardItem from './GameCardItem.vue'
@@ -74,6 +71,31 @@ const emit = defineEmits<{
   gameSelect: [id: GameId]
 }>()
 
+const isMobileViewport = useMediaQuery('(max-width: 760px)')
+const cardInitial = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 16 } : { opacity: 0, y: 28, scale: 0.96 },
+)
+const cardInView = computed(() =>
+  isMobileViewport.value ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, scale: 1 },
+)
+const cardExit = computed(() =>
+  isMobileViewport.value ? { opacity: 0, y: 10 } : { opacity: 0, y: 16, scale: 0.92 },
+)
+const cardHover = computed(() => (isMobileViewport.value ? { y: 0 } : { y: -8, scale: 1.015 }))
+const cardViewport = computed(() => ({
+  once: true,
+  amount: isMobileViewport.value ? 0.08 : 0.16,
+  margin: isMobileViewport.value ? '0px 0px -12% 0px' : '0px',
+}))
+const cardTransition = computed(() => ({
+  layout: {
+    duration: isMobileViewport.value ? 0.24 : 0.32,
+    ease: [0.22, 1, 0.36, 1] as const,
+  },
+  opacity: { duration: isMobileViewport.value ? 0.24 : 0.22, ease: 'easeOut' as const },
+  y: { duration: isMobileViewport.value ? 0.24 : 0.28, ease: 'easeOut' as const },
+  scale: { duration: isMobileViewport.value ? 0.12 : 0.18, ease: 'easeOut' as const },
+}))
 const basketIdSet = computed(() => new Set(props.basketIds))
 const favoriteIdSet = computed(() => new Set(props.favoriteIds))
 const ownedIdSet = computed(() => new Set(props.ownedIds))

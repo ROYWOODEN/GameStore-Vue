@@ -1,12 +1,15 @@
 <template>
   <main
-    class="min-h-[calc(100vh-4.5rem)] bg-(--color-background) px-6 pt-8 pb-12 min-[560px]:px-8 min-[1024px]:px-12 min-[1280px]:px-20"
+    class="min-h-[calc(100vh-4.5rem)] min-w-0 overflow-x-clip bg-(--color-background) px-4 pt-8 pb-12 min-[560px]:px-8 min-[1024px]:px-12 min-[1280px]:px-20"
   >
     <PageLoader v-if="isProfileLoading || isWaitingForSession" />
 
-    <section v-else class="mx-auto grid max-w-7xl gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <section
+      v-else
+      class="mx-auto grid max-w-7xl min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,22rem)]"
+    >
       <motion.div
-        class="xl:col-span-2"
+        class="min-w-0 xl:col-span-2"
         :initial="{ opacity: 0, y: 18 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.28, ease: 'easeOut' }"
@@ -37,7 +40,7 @@
         @save="handleSaveProfile"
       />
 
-      <aside class="grid content-start gap-5">
+      <aside class="grid min-w-0 content-start gap-5">
         <UserSecurityPanel @google="continueWithGoogle" />
         <UserPreferencesPanel
           :locale="currentLocale"
