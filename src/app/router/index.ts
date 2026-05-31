@@ -18,7 +18,8 @@ const router = createRouter({
     },
     {
       path: '/catalog',
-      redirect: { name: 'main' },
+      name: 'catalog',
+      component: () => import('@/pages/CatalogPage/CatalogPage.vue'),
     },
     {
       path: '/search',

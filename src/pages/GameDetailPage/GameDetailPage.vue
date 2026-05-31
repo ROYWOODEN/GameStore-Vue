@@ -14,13 +14,14 @@
     />
 
     <template v-else-if="game">
-      <RouterLink
+      <button
         class="fixed top-24 left-[calc(20%+1.5rem)] z-30 inline-flex w-fit items-center gap-2 rounded-lg border border-(--color-outline-variant) bg-(--color-surface-container-high)/90 px-3 py-2 text-sm font-semibold text-(--color-on-surface-variant) shadow-lg backdrop-blur transition-colors hover:border-(--color-primary) hover:text-(--color-primary) max-[560px]:left-4 lg:z-40"
-        to="/"
+        type="button"
+        @click="handleBackClick"
       >
         <VueIcon name="bs:arrow-left" />
         <span>{{ t('gameDetails.back') }}</span>
-      </RouterLink>
+      </button>
 
       <motion.section
         layout
@@ -135,6 +136,7 @@ import GameReviews from '@/modules/game/ui/details/GameReviews.vue'
 import GameTagPill from '@/modules/game/ui/details/GameTagPill.vue'
 import { useLibrary } from '@/modules/library'
 import { buildAssetUrl } from '@/shared/lib/url'
+import { goBackOrPush } from '@/shared/lib/navigation'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
 import { useI18nMessage } from '@/shared/lib/useI18nMessage'
 import { PageLoader, RetryState } from '@/shared/ui'
@@ -142,9 +144,10 @@ import { useMediaQuery } from '@vueuse/core'
 import { motion } from 'motion-v'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { RouterLink, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const { t } = useI18n()
 const { game, getGame, isLoading, loadError } = useGame()
 const {
@@ -293,6 +296,8 @@ const selectPreviousMedia = (): void => {
       : mediaItems.value.length - 1
   selectedMediaId.value = mediaItems.value[previousIndex]?.id ?? null
 }
+
+const handleBackClick = (): Promise<void> => goBackOrPush(router, { name: 'catalog' })
 
 const showPageApiError = (error: unknown): void => {
   if (isPageActive) {

@@ -2,7 +2,10 @@ export { useGame } from './composables/useGame'
 export { useGameReviews } from './composables/useGameReviews'
 export { useGameSearch } from './composables/useGameSearch'
 export { useGames } from './composables/useGames'
+export { fetchCatalogGenres } from './api/games.api'
 export type {
+  CatalogGenre,
+  CatalogGenreCover,
   Game,
   GameImage,
   GameListItem,

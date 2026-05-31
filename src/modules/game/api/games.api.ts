@@ -1,6 +1,12 @@
 import { api } from '@/shared/api/http'
 import { apiRequest, apiRequestWithMeta } from '@/shared/api/request'
-import type { Game, GameListItem, GameListParams, GameTagTypeWithTags } from '../types/game'
+import type {
+  CatalogGenre,
+  Game,
+  GameListItem,
+  GameListParams,
+  GameTagTypeWithTags,
+} from '../types/game'
 
 const buildListParams = (params: Record<string, unknown>): Record<string, unknown> => {
   const query: Record<string, unknown> = {}
@@ -51,6 +57,21 @@ export const fetchGameTagTypes = async () => {
       },
     }),
   )
+}
+
+export const fetchCatalogGenres = async () => {
+  const response = await api.get<{
+    data?: CatalogGenre[]
+    error?: unknown
+    success?: boolean
+  }>('/catalog/genres')
+  const body = response.data
+
+  if (body.success === false) {
+    throw body.error
+  }
+
+  return body.data ?? []
 }
 
 export const fetchCreateGame = async (body: Omit<Game, 'id' | 'created_at'>) => {
