@@ -1,3 +1,7 @@
+import {
+  getPlatformIcon as getSharedPlatformIcon,
+  getPlatformLabel as getSharedPlatformLabel,
+} from '@/shared/lib/platforms'
 import type { AdminGameTag, AdminTag, AdminTagType, AdminTagTypeSummary } from '../types/admin'
 
 export type AdminTagLike = {
@@ -157,18 +161,9 @@ export const toAdminTag = (
 }
 
 export const getPlatformIcon = (name: string): string => {
-  const platformIcons: Record<string, string> = {
-    pc: 'bs:pc-display-horizontal',
-    windows: 'bs:windows',
-    playstation: 'bs:playstation',
-    xbox: 'bs:xbox',
-    switch: 'bs:nintendo-switch',
-    linux: 'bs:ubuntu',
-    macos: 'bs:apple',
-    mac: 'bs:apple',
-    android: 'bs:android2',
-    ios: 'bs:apple',
-  }
+  return getSharedPlatformIcon(name)
+}
 
-  return platformIcons[name.trim().toLowerCase()] ?? 'bs:display'
+export const getPlatformLabel = (name: string): string => {
+  return getSharedPlatformLabel(name)
 }

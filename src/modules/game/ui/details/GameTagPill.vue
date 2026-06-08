@@ -3,16 +3,17 @@
     class="game-tag inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-bold backdrop-blur"
     :class="{ 'px-3! py-2!': size === 'lg' }"
     :data-tag-type="tagType"
-    :title="tag.name"
+    :title="displayName"
   >
     <VueIcon :name="getTagIcon(tag)" class="text-base" />
-    <span v-if="!iconOnly">{{ tag.name }}</span>
+    <span v-if="!iconOnly">{{ displayName }}</span>
   </span>
 </template>
 
 <script setup lang="ts">
 import type { GameListTag } from '@/modules/game'
 import { getTagIcon, getTagTypeName } from '@/modules/game/lib/tags'
+import { getPlatformLabel } from '@/shared/lib/platforms'
 import { computed } from 'vue'
 
 const props = withDefaults(
@@ -28,6 +29,9 @@ const props = withDefaults(
 )
 
 const tagType = computed(() => getTagTypeName(props.tag))
+const displayName = computed(() =>
+  tagType.value === 'platforma' ? getPlatformLabel(props.tag.name) : props.tag.name,
+)
 </script>
 
 <style scoped>

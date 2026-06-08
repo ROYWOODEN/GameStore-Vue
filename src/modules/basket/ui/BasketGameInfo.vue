@@ -11,9 +11,10 @@
           v-for="platform in platformTags"
           :key="platform.name"
           class="flex h-8 w-8 items-center justify-center rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) text-base text-(--color-on-surface-variant)"
-          :title="platform.name"
+          :aria-label="getPlatformLabel(platform.name)"
+          :title="getPlatformLabel(platform.name)"
         >
-          <VueIcon :name="getPlatformIcon(platform)" />
+          <VueIcon :name="getPlatformIcon(platform.name)" />
         </span>
       </div>
     </div>
@@ -37,7 +38,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { GameTag } from '@/shared/types/game'
+import { getPlatformIcon, getPlatformLabel, isPlatformTagType } from '@/shared/lib/platforms'
 import type { BasketGame } from '../types/basket'
 
 const props = defineProps<{
@@ -46,19 +47,8 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const platformTags = computed(() => props.game.tags.filter((tag) => tag.type === 'platforma'))
+const platformTags = computed(() => props.game.tags.filter((tag) => isPlatformTagType(tag.type)))
 const compactTags = computed(() =>
   props.game.tags.filter((tag) => ['genre', 'mode', 'theme'].includes(tag.type)).slice(0, 3),
 )
-
-const platformIcons: Record<string, string> = {
-  linux: 'bs:ubuntu',
-  macos: 'bs:apple',
-  playstation: 'bs:playstation',
-  switch: 'bs:nintendo-switch',
-  windows: 'bs:windows',
-  xbox: 'bs:xbox',
-}
-
-const getPlatformIcon = (platform: GameTag): string => platformIcons[platform.name] ?? 'bs:display'
 </script>

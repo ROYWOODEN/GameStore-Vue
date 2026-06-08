@@ -206,6 +206,14 @@ body {
   color: var(--color-on-surface) !important;
 }
 
+.p-inputtext:enabled:focus,
+.p-inputtext:enabled:focus-visible,
+.p-inputtext.p-focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary) !important;
+  outline: none !important;
+}
+
 .p-inputtext::placeholder,
 .p-multiselect-label.p-placeholder,
 .p-select-label.p-placeholder {

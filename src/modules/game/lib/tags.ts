@@ -1,7 +1,18 @@
+import { getPlatformIcon } from '@/shared/lib/platforms'
 import type { GameListTag, GameListTagType } from '../types/game'
 
 export const getTagTypeName = (tag: GameListTag): GameListTagType =>
-  typeof tag.type === 'string' ? tag.type : (tag.type.name as GameListTagType)
+  normalizeGameTagType(typeof tag.type === 'string' ? tag.type : tag.type.name)
+
+export const normalizeGameTagType = (type: string): GameListTagType => {
+  const normalizedType = type.trim().toLowerCase()
+
+  if (['platform', 'platforma', 'platforms'].includes(normalizedType)) {
+    return 'platforma'
+  }
+
+  return normalizedType as GameListTagType
+}
 
 export const getTagGroupLabel = (type: string): string =>
   tagTypeLabels[type as GameListTagType] ?? type
@@ -13,15 +24,6 @@ const tagTypeLabels: Record<GameListTagType, string> = {
   mode: 'Mode',
   platforma: 'Platforms',
   theme: 'Theme',
-}
-
-const platformIcons: Record<string, string> = {
-  linux: 'bs:ubuntu',
-  macos: 'bs:apple',
-  playstation: 'bs:playstation',
-  switch: 'bs:nintendo-switch',
-  windows: 'bs:windows',
-  xbox: 'bs:xbox',
 }
 
 const genreIcons: Record<string, string> = {
@@ -48,7 +50,7 @@ export const getTagIcon = (tag: GameListTag): string => {
   const name = tag.name.toLowerCase()
 
   if (type === 'platforma') {
-    return platformIcons[name] ?? tagTypeIcons[type]
+    return getPlatformIcon(name)
   }
 
   if (type === 'genre') {
