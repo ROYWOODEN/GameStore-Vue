@@ -16,9 +16,9 @@
       </span>
     </div>
 
-    <div v-if="tagTypes.length > 0" class="grid gap-4">
+    <div v-if="displayTagTypes.length > 0" class="grid gap-4">
       <section
-        v-for="type in sortedTagTypes"
+        v-for="type in displayTagTypes"
         :key="type.id"
         :class="[
           'rounded-md border bg-(--color-surface-container-low) p-4 transition-colors',
@@ -43,7 +43,7 @@
         <AdminSearchField
           :model-value="getTypeState(type).search"
           class="mb-3"
-          :is-loading="getTypeState(type).isLoading"
+          :is-loading="isTypeLoading(type)"
           :placeholder="t('admin.tags.search')"
           @update:model-value="setSearch(type, $event)"
         />
@@ -59,7 +59,7 @@
         </Message>
 
         <div
-          v-if="getTypeState(type).isLoading && getTypeState(type).tags.length === 0"
+          v-if="isTypeLoading(type) && getDisplayTags(type).length === 0"
           class="grid min-h-24 place-items-center rounded-md border border-dashed border-(--color-outline-variant) bg-(--color-surface-container)"
         >
           <i class="pi pi-spin pi-spinner text-xl text-(--color-primary)" />
@@ -117,27 +117,27 @@
         </button>
 
         <Message
-          v-if="getTypeState(type).error"
+          v-if="getTypeLoadError(type)"
           class="mt-3"
           severity="error"
           size="small"
           variant="simple"
         >
-          {{ getTypeState(type).error }}
+          {{ getTypeLoadError(type) }}
         </Message>
 
         <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
           <span class="text-xs text-(--color-on-surface-variant)">
-            {{ t('admin.tags.totalFound', { count: getTypeState(type).total }) }}
+            {{ t('admin.tags.totalFound', { count: getTypeTotal(type) }) }}
           </span>
           <button
-            v-if="getTypeState(type).hasNextPage"
+            v-if="hasTypeNextPage(type)"
             class="inline-flex h-9 cursor-pointer items-center gap-2 rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) px-3 text-xs font-bold text-(--color-on-surface-variant) transition-colors hover:border-(--color-primary) hover:text-(--color-primary) disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
-            :disabled="getTypeState(type).isLoadingMore"
-            @click="loadTypeTags(type, { append: true })"
+            :disabled="isTypeLoadingMore(type)"
+            @click="loadRelatedTypeTags(type, { append: true })"
           >
-            <i v-if="getTypeState(type).isLoadingMore" class="pi pi-spin pi-spinner" />
+            <i v-if="isTypeLoadingMore(type)" class="pi pi-spin pi-spinner" />
             <VueIcon v-else name="bs:arrow-down" />
             <span>{{ t('admin.tags.loadMore') }}</span>
           </button>
@@ -208,6 +208,29 @@ const sortedTagTypes = computed(() =>
   [...props.tagTypes].sort((first, second) => first.sort_order - second.sort_order),
 )
 
+const getNormalizedTypeKey = (type: AdminTagType): string =>
+  normalizeTagTypeName(type.name) || type.name
+
+const getTypeWeight = (type: AdminTagType): number =>
+  (type.tags?.length ?? 0) + (type.tags_count ?? 0)
+
+const displayTagTypes = computed(() => {
+  const typeByNormalizedName = new Map<string, AdminTagType>()
+
+  for (const type of sortedTagTypes.value) {
+    const normalizedType = getNormalizedTypeKey(type)
+    const currentType = typeByNormalizedName.get(normalizedType)
+
+    if (!currentType || getTypeWeight(type) > getTypeWeight(currentType)) {
+      typeByNormalizedName.set(normalizedType, type)
+    }
+  }
+
+  return [...typeByNormalizedName.values()].sort(
+    (first, second) => first.sort_order - second.sort_order,
+  )
+})
+
 const tagRowClass =
   'flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md border px-3 text-left text-sm font-bold transition-colors'
 
@@ -233,6 +256,29 @@ const ensureTypeState = (type: AdminTagType): TypeState => {
 
 const getTypeState = (type: AdminTagType): TypeState => ensureTypeState(type)
 
+const getRelatedTypes = (type: AdminTagType): AdminTagType[] => {
+  const normalizedType = getNormalizedTypeKey(type)
+  return sortedTagTypes.value.filter((item) => getNormalizedTypeKey(item) === normalizedType)
+}
+
+const getRelatedTypeStates = (type: AdminTagType): TypeState[] =>
+  getRelatedTypes(type).map((item) => ensureTypeState(item))
+
+const isTypeLoading = (type: AdminTagType): boolean =>
+  getRelatedTypeStates(type).some((state) => state.isLoading)
+
+const isTypeLoadingMore = (type: AdminTagType): boolean =>
+  getRelatedTypeStates(type).some((state) => state.isLoadingMore)
+
+const hasTypeNextPage = (type: AdminTagType): boolean =>
+  getRelatedTypeStates(type).some((state) => state.hasNextPage)
+
+const getTypeTotal = (type: AdminTagType): number =>
+  getRelatedTypeStates(type).reduce((total, state) => total + state.total, 0)
+
+const getTypeLoadError = (type: AdminTagType): string | null =>
+  getRelatedTypeStates(type).find((state) => state.error)?.error ?? null
+
 const getTypeError = (type: AdminTagType): string | null => {
   return props.errorsByType[normalizeTagTypeName(type.name)] ?? null
 }
@@ -254,12 +300,19 @@ const getSelectedForType = (type: AdminTagType): AdminTag[] => {
 }
 
 const getDisplayTags = (type: AdminTagType): AdminTag[] => {
-  const state = ensureTypeState(type)
   const selected = getSelectedForType(type)
   const selectedIdSet = new Set(selected.map((tag) => tag.id))
-  const loaded = state.tags.filter((tag) => !selectedIdSet.has(tag.id))
+  const loadedTagMap = new Map<string, AdminTag>()
 
-  return [...selected, ...loaded]
+  for (const state of getRelatedTypeStates(type)) {
+    for (const tag of state.tags) {
+      if (!selectedIdSet.has(tag.id)) {
+        loadedTagMap.set(tag.id, tag)
+      }
+    }
+  }
+
+  return [...selected, ...loadedTagMap.values()]
 }
 
 const canCreateTagFromSearch = (type: AdminTagType): boolean => {
@@ -269,19 +322,22 @@ const canCreateTagFromSearch = (type: AdminTagType): boolean => {
   if (
     !search ||
     state.loadedSearch !== search ||
-    state.isLoading ||
-    state.isLoadingMore ||
-    state.total > 0
+    isTypeLoading(type) ||
+    isTypeLoadingMore(type) ||
+    getTypeTotal(type) > 0
   ) {
     return false
   }
 
-  return !state.tags.some((tag) => tag.name.trim().toLowerCase() === search)
+  return !getDisplayTags(type).some((tag) => tag.name.trim().toLowerCase() === search)
 }
 
 const setSearch = (type: AdminTagType, value: string): void => {
-  const state = ensureTypeState(type)
-  state.search = value
+  const relatedTypes = getRelatedTypes(type)
+
+  for (const relatedType of relatedTypes) {
+    ensureTypeState(relatedType).search = value
+  }
 
   const currentTimer = searchTimers.get(type.id)
   if (currentTimer) {
@@ -291,9 +347,23 @@ const setSearch = (type: AdminTagType, value: string): void => {
   searchTimers.set(
     type.id,
     setTimeout(() => {
-      loadTypeTags(type)
+      loadRelatedTypeTags(type)
     }, 350),
   )
+}
+
+const loadRelatedTypeTags = async (
+  type: AdminTagType,
+  options: {
+    append?: boolean
+  } = {},
+): Promise<void> => {
+  const relatedTypes = getRelatedTypes(type)
+  const typesToLoad = options.append
+    ? relatedTypes.filter((item) => ensureTypeState(item).hasNextPage)
+    : relatedTypes
+
+  await Promise.all(typesToLoad.map((item) => loadTypeTags(item, options)))
 }
 
 const loadTypeTags = async (
@@ -324,7 +394,7 @@ const loadTypeTags = async (
       limit: state.limit,
       page,
       search: requestedSearch || undefined,
-      type: type.name,
+      typeId: type.id,
     })
     const loadedTags = result.data.map((tag) => toAdminTag(tag, type))
     const currentTags = options.append ? state.tags : []

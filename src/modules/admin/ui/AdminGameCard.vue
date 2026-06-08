@@ -72,8 +72,8 @@
           v-for="platform in platformTags"
           :key="`platform-${platform.id}-${platform.name}`"
           class="flex h-8 w-8 items-center justify-center rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) text-base text-(--color-on-surface-variant)"
-          :title="platform.name"
-          :aria-label="platform.name"
+          :title="getPlatformLabel(platform.name)"
+          :aria-label="getPlatformLabel(platform.name)"
         >
           <VueIcon :name="getPlatformIcon(platform.name)" />
         </span>
@@ -114,7 +114,7 @@ import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
 import { useDateFormat } from '@vueuse/core'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getPlatformIcon, getTagTypeName } from '../lib/tags'
+import { getPlatformIcon, getPlatformLabel, getTagTypeName } from '../lib/tags'
 
 const props = withDefaults(
   defineProps<{
@@ -143,7 +143,9 @@ const coverImage = computed(
 const coverUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverAlt = computed(() => coverImage.value?.alt || props.game.title)
 const isFree = computed(() => isFreePrice(props.game.price))
-const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
+const formattedPrice = computed(() =>
+  isFree.value ? t('game.free') : formatRubPrice(props.game.price),
+)
 const platformTags = computed(() =>
   props.game.tags.filter((tag) => getTagTypeName(tag) === 'platform'),
 )

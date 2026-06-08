@@ -1,6 +1,7 @@
 export { useAdminCatalog } from './composables/useAdminCatalog'
 export {
   getPlatformIcon,
+  getPlatformLabel,
   getRequiredTagTypes,
   getTagRuleText,
   getTagRuleTextKey,

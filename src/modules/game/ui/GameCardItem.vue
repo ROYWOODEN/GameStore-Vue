@@ -156,9 +156,10 @@
               v-for="platform in platformTags"
               :key="platform.name"
               class="flex h-7 w-7 items-center justify-center rounded-md border border-(--color-outline-variant) bg-(--color-surface-container-high) text-base text-(--color-on-surface-variant)"
-              :title="platform.name"
+              :aria-label="getPlatformLabel(platform.name)"
+              :title="getPlatformLabel(platform.name)"
             >
-              <VueIcon :name="getPlatformIcon(platform)" />
+              <VueIcon :name="getPlatformIcon(platform.name)" />
             </span>
           </div>
 
@@ -215,6 +216,7 @@
 <script setup lang="ts">
 import { buildAssetUrl } from '@/shared/lib/url'
 import { formatRubPrice, isFreePrice } from '@/shared/lib/price'
+import { getPlatformIcon, getPlatformLabel } from '@/shared/lib/platforms'
 import { AnimatePresence, motion } from 'motion-v'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
@@ -222,7 +224,8 @@ import Tag from 'primevue/tag'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatGameRating } from '../lib/rating'
-import type { GameListItem, GameListTag, GameListTagType } from '../types/game'
+import { getTagTypeName } from '../lib/tags'
+import type { GameListItem, GameListTagType } from '../types/game'
 
 const props = withDefaults(
   defineProps<{
@@ -265,7 +268,9 @@ const coverImage = computed(
 const coverImageUrl = computed(() => buildAssetUrl(coverImage.value?.url, apiUrl))
 const coverImageAlt = computed(() => coverImage.value?.alt || props.game.title)
 const isFree = computed(() => isFreePrice(props.game.price))
-const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
+const formattedPrice = computed(() =>
+  isFree.value ? t('game.free') : formatRubPrice(props.game.price),
+)
 const ratingAverage = computed(() => props.game.rating?.average ?? null)
 const ratingCount = computed(() => props.game.rating?.count ?? 0)
 const hasRating = computed(() => ratingAverage.value !== null && ratingCount.value > 0)
@@ -308,19 +313,4 @@ const basketButtonText = computed(() => {
 const basketLabel = computed(() =>
   props.isInBasket ? t('game.removeFromCart') : t('game.addToCart'),
 )
-
-const platformIcons: Record<string, string> = {
-  windows: 'bs:windows',
-  playstation: 'bs:playstation',
-  xbox: 'bs:xbox',
-  switch: 'bs:nintendo-switch',
-  linux: 'bs:ubuntu',
-  macos: 'bs:apple',
-}
-
-const getPlatformIcon = (platform: GameListTag): string =>
-  platformIcons[platform.name.toLowerCase()] ?? 'bs:display'
-
-const getTagTypeName = (tag: GameListTag): GameListTagType =>
-  typeof tag.type === 'string' ? tag.type : (tag.type.name as GameListTagType)
 </script>
