@@ -49,5 +49,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const isFree = computed(() => isFreePrice(props.game.price))
-const formattedPrice = computed(() => (isFree.value ? t('game.free') : formatRubPrice(props.game.price)))
+const formattedPrice = computed(() =>
+  isFree.value ? t('game.free') : formatRubPrice(props.game.price),
+)
 </script>

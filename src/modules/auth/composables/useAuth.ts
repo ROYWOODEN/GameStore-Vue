@@ -3,7 +3,7 @@ import { toApiError } from '@/shared/api/error'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchLogin, fetchLogout, fetchRegister } from '../api/auth.api'
+import { fetchGoogleLinkUrl, fetchLogin, fetchLogout, fetchRegister } from '../api/auth.api'
 import { useAuthStore } from '../stores/auth.store'
 import type { AuthSession, LoginPayload, OAuthProvider, RegisterPayload } from '../types/auth'
 
@@ -50,9 +50,9 @@ export const useAuth = () => {
     authStore.clearSession()
     router.push('/')
   }
-  const refresh = async () => {
+  const refresh = async (): Promise<boolean> => {
     try {
-      await authStore.refreshSession()
+      return await authStore.refreshSession()
     } catch (error: unknown) {
       const apiError = toApiError(error)
       throw apiError
@@ -69,6 +69,13 @@ export const useAuth = () => {
     await continueWithOAuth('google')
   }
 
+  const continueWithGoogleLink = async (): Promise<void> => {
+    await runAuthAction(async () => {
+      const { url } = await fetchGoogleLinkUrl()
+      window.location.href = url
+    })
+  }
+
   const clearError = (): void => {
     authError.value = null
   }
@@ -79,6 +86,7 @@ export const useAuth = () => {
     logout,
     refresh,
     continueWithGoogle,
+    continueWithGoogleLink,
     continueWithOAuth,
     authError,
     isAuthenticated,

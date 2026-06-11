@@ -94,11 +94,7 @@
 import { useAuth, useAuthPrompt } from '@/modules/auth'
 import { useBasket, type BasketGame } from '@/modules/basket'
 import { useFavorites, type FavoriteGameId } from '@/modules/favorite'
-import {
-  GameCardGrid,
-  GameSearchFilters,
-  useGameSearch,
-} from '@/modules/game'
+import { GameCardGrid, GameSearchFilters, useGameSearch } from '@/modules/game'
 import { useLibrary } from '@/modules/library'
 import { toApiError } from '@/shared/api/error'
 import { useApiErrorToast } from '@/shared/lib/useApiErrorToast'
@@ -244,7 +240,12 @@ const queueScrollCheck = (): void => {
 }
 
 const handleWindowScroll = (): void => {
-  if (isLoading.value || isLoadingMore.value || loadMoreError.value || !pagination.value.hasNextPage) {
+  if (
+    isLoading.value ||
+    isLoadingMore.value ||
+    loadMoreError.value ||
+    !pagination.value.hasNextPage
+  ) {
     return
   }
 

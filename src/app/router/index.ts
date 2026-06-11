@@ -35,6 +35,18 @@ const router = createRouter({
       },
     },
     {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('@/pages/AuthCallbackPage/AuthCallbackPage.vue'),
+    },
+    {
+      path: '/login',
+      redirect: (to) => ({
+        name: 'auth-callback',
+        query: to.query,
+      }),
+    },
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('@/pages/FavoritesPage/FavoritesPage.vue'),

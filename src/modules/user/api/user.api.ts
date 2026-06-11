@@ -1,5 +1,6 @@
 import { api } from '@/shared/api/http'
 import { apiRequest } from '@/shared/api/request'
+import type { UserAuthProvider } from '@/shared/types/user'
 import type { User } from '../types/user'
 
 export type UpdateCurrentUserPayload = Pick<User, 'email' | 'name'> & {
@@ -28,6 +29,10 @@ export const fetchUpdateCurrentUserAvatar = async (avatar: File) => {
 
 export const fetchDeleteCurrentUserAvatar = async () => {
   return await apiRequest<User>(api.delete('/users/me/avatar'))
+}
+
+export const fetchUnlinkCurrentUserProvider = async (provider: UserAuthProvider) => {
+  return await apiRequest<User>(api.delete(`/users/me/providers/${provider}`))
 }
 
 export const fetchDeleteCurrentUser = async () => {

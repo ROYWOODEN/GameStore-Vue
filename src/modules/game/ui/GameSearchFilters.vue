@@ -5,11 +5,7 @@
     <FloatLabel variant="on">
       <IconField>
         <InputIcon class="pi pi-search text-(--color-search-icon)!" />
-        <InputText
-          id="search_page_query"
-          v-model="queryModel"
-          class="h-12! w-full! rounded-md!"
-        />
+        <InputText id="search_page_query" v-model="queryModel" class="h-12! w-full! rounded-md!" />
       </IconField>
       <label for="search_page_query">{{ t('search.filters.query') }}</label>
     </FloatLabel>

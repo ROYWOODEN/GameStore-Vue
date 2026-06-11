@@ -1,4 +1,10 @@
 export type UserRole = 'admin' | 'user'
+export type UserAuthProvider = 'google'
+
+export interface UserAuthState {
+  hasPassword: boolean
+  providers: UserAuthProvider[]
+}
 
 export interface User {
   id: number | string
@@ -7,4 +13,5 @@ export interface User {
   avatar_url: string | null
   created_at: string
   role: UserRole
+  auth: UserAuthState
 }

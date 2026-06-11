@@ -352,6 +352,26 @@ const setSearch = (type: AdminTagType, value: string): void => {
   )
 }
 
+const clearRelatedSearchTimers = (type: AdminTagType): void => {
+  for (const relatedType of getRelatedTypes(type)) {
+    const currentTimer = searchTimers.get(relatedType.id)
+
+    if (currentTimer) {
+      clearTimeout(currentTimer)
+      searchTimers.delete(relatedType.id)
+    }
+  }
+}
+
+const resetRelatedSearch = (type: AdminTagType): void => {
+  for (const relatedType of getRelatedTypes(type)) {
+    const relatedState = ensureTypeState(relatedType)
+    relatedState.search = ''
+    relatedState.loadedSearch = ''
+    relatedState.page = 1
+  }
+}
+
 const loadRelatedTypeTags = async (
   type: AdminTagType,
   options: {
@@ -425,11 +445,7 @@ const createTagFromSearch = async (type: AdminTagType): Promise<void> => {
     return
   }
 
-  const currentTimer = searchTimers.get(type.id)
-  if (currentTimer) {
-    clearTimeout(currentTimer)
-    searchTimers.delete(type.id)
-  }
+  clearRelatedSearchTimers(type)
 
   try {
     state.error = null
@@ -438,11 +454,17 @@ const createTagFromSearch = async (type: AdminTagType): Promise<void> => {
     const createdTag = toAdminTag(await fetchAdminCreateTag({ name, typeId: type.id }), type)
     state.tags = [createdTag, ...state.tags.filter((tag) => tag.id !== createdTag.id)]
     state.total = Math.max(state.total + 1, state.tags.length)
-    state.search = ''
-    state.loadedSearch = ''
+    resetRelatedSearch(type)
 
     if (!isSelected(createdTag.id)) {
       toggleTag(type, createdTag)
+    }
+
+    await loadRelatedTypeTags(type)
+
+    if (!state.tags.some((tag) => tag.id === createdTag.id)) {
+      state.tags = [createdTag, ...state.tags]
+      state.total = Math.max(state.total, state.tags.length)
     }
 
     toast.add({ severity: 'success', summary: t('admin.tags.toastCreated'), life: 2400 })
