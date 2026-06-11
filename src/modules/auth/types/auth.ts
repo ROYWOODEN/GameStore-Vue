@@ -1,8 +1,8 @@
-import type { User, UserRole } from '@/shared/types/user'
+import type { User, UserAuthProvider, UserRole } from '@/shared/types/user'
 
 export type AuthMode = 'login' | 'register'
 
-export type OAuthProvider = 'google'
+export type OAuthProvider = UserAuthProvider
 
 export interface LoginPayload {
   email: string

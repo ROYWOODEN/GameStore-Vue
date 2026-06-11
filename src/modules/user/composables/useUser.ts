@@ -3,11 +3,13 @@ import { storeToRefs } from 'pinia'
 import {
   fetchDeleteCurrentUser,
   fetchDeleteCurrentUserAvatar,
+  fetchUnlinkCurrentUserProvider,
   fetchUpdateCurrentUser,
   fetchUpdateCurrentUserAvatar,
 } from '../api/user.api'
 import { useUserStore } from '../stores/user.store'
 import type { UpdateCurrentUserPayload } from '../api/user.api'
+import type { UserAuthProvider } from '@/shared/types/user'
 
 export const useUser = () => {
   const userStore = useUserStore()
@@ -52,6 +54,16 @@ export const useUser = () => {
     }
   }
 
+  const unlinkCurrentUserProvider = async (provider: UserAuthProvider): Promise<void> => {
+    try {
+      const res = await fetchUnlinkCurrentUserProvider(provider)
+      userStore.setCurrentUser(res)
+    } catch (error: unknown) {
+      const apiError = toApiError(error)
+      throw apiError
+    }
+  }
+
   const deleteCurrentUser = async (): Promise<void> => {
     try {
       await fetchDeleteCurrentUser()
@@ -66,6 +78,7 @@ export const useUser = () => {
     deleteCurrentUser,
     deleteCurrentUserAvatar,
     loadCurrentUser,
+    unlinkCurrentUserProvider,
     updateCurrentUser,
     updateCurrentUserAvatar,
     user,

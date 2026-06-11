@@ -181,7 +181,12 @@ const queueScrollCheck = (): void => {
 }
 
 const handleWindowScroll = (): void => {
-  if (isLoading.value || isLoadingMore.value || loadMoreError.value || !pagination.value.hasNextPage) {
+  if (
+    isLoading.value ||
+    isLoadingMore.value ||
+    loadMoreError.value ||
+    !pagination.value.hasNextPage
+  ) {
     return
   }
 

@@ -41,7 +41,13 @@
       />
 
       <aside class="grid min-w-0 content-start gap-5">
-        <UserSecurityPanel @google="continueWithGoogle" />
+        <UserSecurityPanel
+          :has-password="hasPassword"
+          :is-google-linked="isGoogleLinked"
+          :is-google-updating="isGoogleProviderUpdating"
+          @connect-google="handleConnectGoogle"
+          @disconnect-google="requestDisconnectGoogle"
+        />
         <UserPreferencesPanel
           :locale="currentLocale"
           :theme="theme"
@@ -82,7 +88,7 @@ const maxAvatarSizeBytes = 5 * 1024 * 1024
 
 const router = useRouter()
 const { locale, t } = useI18n()
-const { continueWithGoogle, isAuthenticated, isSessionInitialized, setAccessToken } = useAuth()
+const { continueWithGoogleLink, isAuthenticated, isSessionInitialized, setAccessToken } = useAuth()
 const { theme, toggleTheme } = useAppTheme()
 const { showApiError } = useApiErrorToast()
 const confirm = useConfirm()
@@ -91,6 +97,7 @@ const {
   deleteCurrentUser,
   deleteCurrentUserAvatar,
   loadCurrentUser,
+  unlinkCurrentUserProvider,
   updateCurrentUser,
   updateCurrentUserAvatar,
   user,
@@ -101,6 +108,7 @@ const selectedAvatarUrl = ref<string | null>(null)
 const avatarMarkedForRemoval = ref(false)
 const isAvatarDeleting = ref(false)
 const isDeletingUser = ref(false)
+const isGoogleProviderUpdating = ref(false)
 const isProfileLoading = ref(false)
 const isSaving = ref(false)
 const hasSubmitted = ref(false)
@@ -123,6 +131,8 @@ const displayAvatarUrl = computed(() => {
   return selectedAvatarUrl.value || currentAvatarUrl.value
 })
 const currentLocale = computed(() => locale.value as AppLocale)
+const hasPassword = computed(() => Boolean(user.value?.auth?.hasPassword))
+const isGoogleLinked = computed(() => user.value?.auth?.providers.includes('google') ?? false)
 const profileName = computed(() => getUserDisplayName(user.value, t('profile.fallbackName')))
 const userInitials = computed(() => getUserInitials(user.value))
 
@@ -255,6 +265,57 @@ const handleSaveProfile = async (): Promise<void> => {
     isSaving.value = false
     isAvatarDeleting.value = false
   }
+}
+
+const handleConnectGoogle = async (): Promise<void> => {
+  if (isGoogleProviderUpdating.value) {
+    return
+  }
+
+  try {
+    isGoogleProviderUpdating.value = true
+    await continueWithGoogleLink()
+  } catch (error: unknown) {
+    showApiError(error)
+    isGoogleProviderUpdating.value = false
+  }
+}
+
+const handleDisconnectGoogle = async (): Promise<void> => {
+  if (isGoogleProviderUpdating.value || !isGoogleLinked.value || !hasPassword.value) {
+    return
+  }
+
+  try {
+    isGoogleProviderUpdating.value = true
+    await unlinkCurrentUserProvider('google')
+    toast.add({
+      severity: 'success',
+      summary: t('profile.security.googleUnlinked'),
+      life: 3000,
+    })
+  } catch (error: unknown) {
+    showApiError(error)
+  } finally {
+    isGoogleProviderUpdating.value = false
+  }
+}
+
+const requestDisconnectGoogle = (): void => {
+  confirm.require({
+    accept: () => {
+      handleDisconnectGoogle()
+    },
+    acceptClass: 'profile-confirm-delete-button',
+    acceptIcon: 'pi pi-google',
+    acceptLabel: t('profile.security.confirmGoogleDisconnectAction'),
+    defaultFocus: 'reject',
+    header: t('profile.security.confirmGoogleDisconnectTitle'),
+    icon: 'pi pi-exclamation-triangle',
+    message: t('profile.security.confirmGoogleDisconnectDescription'),
+    rejectClass: 'profile-confirm-cancel-button',
+    rejectLabel: t('profile.account.cancelAction'),
+  })
 }
 
 const handleDeleteUser = async (): Promise<void> => {
