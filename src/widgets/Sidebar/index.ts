@@ -1,3 +1,1 @@
-import AppSidebar from './AppSidebar.vue'
-
-export { AppSidebar }
+export { default as AppSidebar } from './AppSidebar.vue'
